@@ -7,19 +7,19 @@ const app = require("./app");
 connectDB();
 const server = require("http").createServer(app);
 
-const io = socket(server);
-io.on("connection", (socket) => {
-  console.log("User connected");
+// const io = socket(server);
+// io.on("connection", (socket) => {
+//   console.log("User connected");
 
-  // PRERESERVED EVENT
-  setTimeout(() => {
-    socket.send("Welcome to the chat!");
-  }, 3000);
+//   // PRERESERVED EVENT
+//   setTimeout(() => {
+//     socket.send("Welcome to the chat!");
+//   }, 3000);
 
-  socket.on("disconnect", () => {
-    console.log("User disconnected");
-  });
-});
+//   socket.on("disconnect", () => {
+//     console.log("User disconnected");
+//   });
+// });
 
 const PORT = process.env.PORT || 3000;
 mongoose.connection.once("open", () => {

@@ -1,23 +1,25 @@
-const productSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, "A product must have a name"],
+const mongoose = require("mongoose");
+const productSchema = new mongoose.Schema(
+  {
+    product_name: {
+      type: String,
+      required: [true, "A product must have a name"],
+    },
+    unique_id: {
+      type: String,
+      required: [true, "A product must have a unique id"],
+    },
+    cost_price: {
+      type: Number,
+      required: [true, "A product must have a cost price"],
+      default: 0,
+    },
   },
-  unique_id: {
-    type: String,
-    required: [true, "A product must have a unique id"],
-  },
-  bill_id: {
-    type: mongoose.Schema.ObjectId,
-    ref: "Bill",
-    required: [true, "A product must have a bill id"],
-  },
-  cost_price: {
-    type: Number,
-    required: [true, "A product must have a cost price"],
-    default: 0,
-  },
-});
+  {
+    timestamps: true,
+    virtuals: true,
+  }
+);
 
 const Product = mongoose.model("Product", productSchema);
 module.exports = Product;
