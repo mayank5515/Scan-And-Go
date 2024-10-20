@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   removeProduct,
   updateProductQuantity,
   productData,
 } from "../data/productData.js";
-import ProductItem from "../components/ShoppingListComponents/ProductItem";
+
+import ProductListComp from "../components/ShoppingListComponents/ProductListComp.jsx";
+import TotalComponent from "../components/ShoppingListComponents/TotalComponent.jsx";
 export default function ShoppingListPage() {
   const [products, setProducts] = useState([...productData]);
+  const [totalBill, setTotalBill] = useState(0);
   function handleDelete(id) {
     setProducts((prevProducts) => {
       return prevProducts.filter((product, i) => {
@@ -62,30 +65,14 @@ export default function ShoppingListPage() {
       </h1>
       <div className="border-4 border-green-600 p-10">
         {/* LIST OF ITEMS */}
-        <div className="border-2 border-gray-500 space-y-1 bg-stone-200  p-2 overflow-y-scroll h-[75vh]">
-          {products.length > 0 ? (
-            products.map((product, ind) => {
-              return (
-                <ProductItem
-                  key={ind}
-                  id={product.id}
-                  productName={product.productName}
-                  cost={product.cost}
-                  quantity={product.quantity}
-                  currency={product.currency}
-                  handleDelete={handleDelete}
-                  handleDecrement={handleDecrement}
-                  handleIncrement={handleIncrement}
-                />
-              );
-            })
-          ) : (
-            <p className="text-black text-[16px] text-center h-[30%] flex justify-center items-center">
-              Please Add items in your cart
-            </p>
-          )}
-        </div>
+        <ProductListComp
+          products={products}
+          handleDelete={handleDelete}
+          handleDecrement={handleDecrement}
+          handleIncrement={handleIncrement}
+        />
         {/* TOTAL BILL */}
+        <TotalComponent />
       </div>
     </section>
   );
