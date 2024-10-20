@@ -33,8 +33,8 @@ exports.getAllProducts = async (req, res) => {
     ]);
 
     const totalCost = totalCostAggregate[0].totalCost; // TOTAL COST:  [ { _id: null, totalCost: 656 } ]
-    // console.log("PRODUCTS: ", products);
-    console.log("TOTAL COST: ", totalCost);
+    console.log("PRODUCTS: ", products);
+    // console.log("TOTAL COST: ", totalCost);
 
     res.status(200).json({
       status: "success",
@@ -79,7 +79,7 @@ exports.addProduct = async (req, res) => {
       cost_price,
     });
 
-    console.log("NEW PRODUCT: ", newProduct);
+    console.log("NEW PRODUCT was added : ", newProduct);
     // console.log("COUNT OF PRODUCT: ", countOfProduct);
 
     res.status(201).json({
