@@ -7,7 +7,7 @@ import {
 } from "../data/productData.js";
 
 import ProductListComp from "../components/ShoppingListComponents/ProductListComp.jsx";
-import TotalComponent from "../components/ShoppingListComponents/TotalComponent.jsx";
+import Total from "../components/ShoppingListComponents/Total.jsx";
 export default function ShoppingListPage() {
   const [products, setProducts] = useState([...productData]);
   const [totalBill, setTotalBill] = useState(0);
@@ -63,7 +63,7 @@ export default function ShoppingListPage() {
       <h1 className="text-black text-[30px] text-center mb-2">
         Shopping List 🛒
       </h1>
-      <div className="border-4 border-green-600 p-10">
+      <div className="border-4 border-green-600 p-4 h-[85vh] flex flex-col lg:flex-row ">
         {/* LIST OF ITEMS */}
         <ProductListComp
           products={products}
@@ -72,7 +72,7 @@ export default function ShoppingListPage() {
           handleIncrement={handleIncrement}
         />
         {/* TOTAL BILL */}
-        <TotalComponent />
+        <Total totalBill={totalBill} />
       </div>
     </section>
   );

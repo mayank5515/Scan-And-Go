@@ -23,9 +23,9 @@ export default function ProductItem({
         quantity={quantity}
         currency={currency}
       />
-      <hr className="border-t " />
+      {/* <hr className="border-t " /> */}
       {/* REMOVE BUTTON , DECREMENT BUTTON AND INCREMENT BUTTON */}
-      <div className="flex justify-between items-center  p-1">
+      {/* <div className="flex justify-between items-center  p-1">
         <button
           className="flex justify-center  rounded-lg p-2 items-center hover:bg-gray-200 "
           onClick={() => handleDelete(id)}
@@ -38,7 +38,7 @@ export default function ProductItem({
           quantity={quantity}
           id={id}
         />
-      </div>
+      </div> */}
       {/* REMOVE BUTTON , DECREMENT BUTTON AND INCREMENT BUTTON */}
     </div>
   );

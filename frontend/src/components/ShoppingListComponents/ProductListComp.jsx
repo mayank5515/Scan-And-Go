@@ -7,7 +7,7 @@ export default function ProductListComp({
   handleIncrement,
 }) {
   return (
-    <div className="border-2 border-gray-500 space-y-1 bg-stone-200  p-2 overflow-y-scroll h-[75vh]">
+    <div className="border-2 border-gray-500 space-y-1 bg-stone-200 lg:w-[65vw] lg:h-auto p-2 overflow-y-scroll h-[60vh]">
       {products.length > 0 ? (
         products.map((product, ind) => {
           return (
