@@ -22,12 +22,24 @@ exports.getAllProducts = async (req, res) => {
         },
       },
     ]);
+    //to find total cost of all products
+    const totalCostAggregate = await Product.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalCost: { $sum: "$cost_price" },
+        },
+      },
+    ]);
 
-    console.log("PRODUCTS: ", products);
+    const totalCost = totalCostAggregate[0].totalCost; // TOTAL COST:  [ { _id: null, totalCost: 656 } ]
+    // console.log("PRODUCTS: ", products);
+    console.log("TOTAL COST: ", totalCost);
 
     res.status(200).json({
       status: "success",
       data: products,
+      total: totalCost,
     });
   } catch (err) {
     res.status(400).json({
