@@ -2,6 +2,7 @@ const socket = require("socket.io");
 const connectDB = require("./middlewares/dbconn");
 const mongoose = require("mongoose");
 const app = require("./app");
+// var WebSocketServer = require("websocket").server;
 
 //CONNECT TO DATABASE -> IF FAILS DONOT START SERVER
 connectDB();

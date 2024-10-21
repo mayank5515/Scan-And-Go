@@ -33,7 +33,7 @@ exports.getAllProducts = async (req, res) => {
     ]);
 
     const totalCost = totalCostAggregate[0].totalCost; // TOTAL COST:  [ { _id: null, totalCost: 656 } ]
-    console.log("PRODUCTS: ", products);
+    console.log("PRODUCTS get request: ");
     // console.log("TOTAL COST: ", totalCost);
 
     res.status(200).json({
