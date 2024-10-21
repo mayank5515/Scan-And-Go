@@ -33,17 +33,17 @@ export default function ProductListComp({
   );
 }
 
-ProductListComp.propTypes = {
-  products: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      productName: PropTypes.string.isRequired,
-      cost: PropTypes.number.isRequired,
-      quantity: PropTypes.number.isRequired,
-      currency: PropTypes.string.isRequired,
-    })
-  ).isRequired,
-  handleDelete: PropTypes.func.isRequired,
-  handleDecrement: PropTypes.func.isRequired,
-  handleIncrement: PropTypes.func.isRequired,
-};
+// ProductListComp.propTypes = {
+//   products: PropTypes.arrayOf(
+//     PropTypes.shape({
+//       id: PropTypes.number.isRequired,
+//       productName: PropTypes.string.isRequired,
+//       cost: PropTypes.number.isRequired,
+//       quantity: PropTypes.number.isRequired,
+//       currency: PropTypes.string.isRequired,
+//     })
+//   ).isRequired,
+//   handleDelete: PropTypes.func.isRequired,
+//   handleDecrement: PropTypes.func.isRequired,
+//   handleIncrement: PropTypes.func.isRequired,
+// };
