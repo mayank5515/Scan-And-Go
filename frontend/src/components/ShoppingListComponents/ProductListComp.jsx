@@ -1,28 +1,11 @@
 import PropTypes from "prop-types";
 import ProductItem from "./ProductItem";
-export default function ProductListComp({
-  products,
-  handleDelete,
-  handleDecrement,
-  handleIncrement,
-}) {
+export default function ProductListComp({ products }) {
   return (
     <div className="border-2 border-gray-500 space-y-1 bg-stone-200 lg:w-[65vw] lg:h-auto p-2 overflow-y-scroll h-[60vh]">
       {products.length > 0 ? (
-        products.map((product, ind) => {
-          return (
-            <ProductItem
-              key={ind}
-              id={product.id}
-              productName={product.productName}
-              cost={product.cost}
-              quantity={product.quantity}
-              currency={product.currency}
-              handleDelete={handleDelete}
-              handleDecrement={handleDecrement}
-              handleIncrement={handleIncrement}
-            />
-          );
+        products.map((el, ind) => {
+          return <ProductItem key={ind} id={el.id} product={el} />;
         })
       ) : (
         <p className="text-black text-[16px] text-center h-[30%] flex justify-center items-center">

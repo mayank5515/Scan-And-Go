@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import toast from "react-hot-toast";
 import {
   removeProduct,
   updateProductQuantity,
@@ -10,16 +11,21 @@ import {
 import ProductListComp from "../components/ShoppingListComponents/ProductListComp.jsx";
 import Total from "../components/ShoppingListComponents/Total.jsx";
 export default function ShoppingListPage() {
-  const [products, setProducts] = useState([...productData]);
+  const [products, setProducts] = useState([]);
   const [totalBill, setTotalBill] = useState(0);
-
+  //
+  const URL = `http://192.168.179.131:3000`;
   useEffect(() => {
     const fetchAllProducts = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:3000/api/v1/products"
-        );
-        console.log(response);
+        const response = await axios.get("" + URL + "/api/v1/products");
+        const Objdata = response.data;
+        const { total } = Objdata;
+        console.log(Objdata, total, Objdata.data);
+        // const newProducts=Objdata.data.((el,i) => { });
+        setProducts(Objdata.data); //array store ho rha h
+        setTotalBill(total);
+        // console.log(products);
       } catch (err) {
         console.log(err);
       }
@@ -32,14 +38,9 @@ export default function ShoppingListPage() {
       <h1 className="text-black text-[30px] text-center mb-2">
         Shopping List 🛒
       </h1>
-      <div className="border-4 border-green-600 p-4 h-[85vh] flex flex-col lg:flex-row ">
+      <div className="border-4 border-green-600 p-2 h-[85vh] flex flex-col lg:flex-row ">
         {/* LIST OF ITEMS */}
-        <ProductListComp
-          products={products}
-          // handleDelete={handleDelete}
-          // handleDecrement={handleDecrement}
-          // handleIncrement={handleIncrement}
-        />
+        <ProductListComp products={products} />
         {/* TOTAL BILL */}
         <Total totalBill={totalBill} />
       </div>
