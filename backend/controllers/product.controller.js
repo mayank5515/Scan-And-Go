@@ -3,6 +3,7 @@
 const Product = require("../models/Product.models");
 //GET ALL PRODUCTS -> DYNAMIC IN NATURE USING SOCKET.IO
 exports.getAllProducts = async (req, res) => {
+  console.log("GET REQUEST");
   try {
     //BASICALLY WE NEED TO GROUP BY unique_id and then count the number of occurences of each product
     //and send back all products with their respective quantities
@@ -38,6 +39,7 @@ exports.getAllProducts = async (req, res) => {
 
     res.status(200).json({
       status: "success",
+      results: products.length,
       data: products,
       total: totalCost,
     });
