@@ -1,11 +1,12 @@
 import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-// import toast from "react-hot-toast";
+import toast from "react-hot-toast";
 import io from "socket.io-client";
 
 import ProductListComp from "../components/ShoppingListComponents/ProductListComp.jsx";
 import Total from "../components/ShoppingListComponents/Total.jsx";
+import TotalList from "../components/TotalComponents/TotalList.jsx";
 
 const URL = "http://localhost:3000";
 const socket = io(URL);
@@ -21,6 +22,9 @@ export default function ShoppingListPage() {
         const response = await axios.get("" + URL + "/api/v1/products");
         const Objdata = response.data;
         const { total } = Objdata;
+        if (response.status === 204) {
+          return toast.error("Please add items to your cart 🛒");
+        }
         console.log(Objdata, total, Objdata.data);
         // const newProducts=Objdata.data.((el,i) => { });
         setProducts(Objdata.data); //array store ho rha h
@@ -60,50 +64,3 @@ export default function ShoppingListPage() {
     </section>
   );
 }
-
-// function handleDelete(id) {
-//   setProducts((prevProducts) => {
-//     return prevProducts.filter((product, i) => {
-//       if (product.id === id) {
-//         removeProduct(id);
-//         return false;
-//       }
-//       return true;
-//     });
-//   });
-// }
-
-// function handleIncrement(id) {
-//   setProducts((prevProducts) => {
-//     return prevProducts.reduce((acc, product) => {
-//       if (product.id === id) {
-//         const newQuantity = product.quantity + 1; // Increment the quantity
-//         updateProductQuantity(id, newQuantity); // Update the original array
-//         // Add the updated product to the new array
-//         return [...acc, { ...product, quantity: newQuantity }];
-//       }
-//       // Keep other products in the state
-//       return [...acc, product];
-//     }, []); // Initial value for acc is an empty array
-//   });
-// }
-// function handleDecrement(id) {
-//   setProducts((prevProducts) => {
-//     // Create a copy of the products array to modify
-//     return prevProducts.reduce((acc, product) => {
-//       if (product.id === id) {
-//         if (product.quantity === 1) {
-//           removeProduct(id); // Remove from the original array
-//           return acc; // Skip adding this product to the new array
-//         } else {
-//           const newQuantity = product.quantity - 1;
-//           updateProductQuantity(id, newQuantity); // Update the original array
-//           // Add the updated product to the new array
-//           return [...acc, { ...product, quantity: newQuantity }];
-//         }
-//       }
-//       // Keep other products in the state
-//       return [...acc, product];
-//     }, []);
-//   });
-// }
