@@ -3,7 +3,6 @@
 const Product = require("../models/Product.models");
 //GET ALL PRODUCTS -> DYNAMIC IN NATURE USING SOCKET.IO
 exports.getAllProducts = async (req, res) => {
-  console.log("GET REQUEST");
   try {
     //BASICALLY WE NEED TO GROUP BY unique_id and then count the number of occurences of each product
     //and send back all products with their respective quantities
@@ -34,7 +33,7 @@ exports.getAllProducts = async (req, res) => {
     ]);
 
     const totalCost = totalCostAggregate[0].totalCost; // TOTAL COST:  [ { _id: null, totalCost: 656 } ]
-    console.log("PRODUCTS get request: ");
+    console.log(`GET REQUEST made :  ${new Date()}`);
     // console.log("TOTAL COST: ", totalCost);
 
     res.status(200).json({
@@ -52,8 +51,9 @@ exports.getAllProducts = async (req, res) => {
 };
 
 //ADD NEW PRODUCT
-exports.addProduct = async (req, res) => {
+exports.addProduct = async (req, res, io) => {
   try {
+    // console.log("IO FROM ADD PRODUCT", io); // Check if io is defined
     //ALERT: product aaega kha se ? req.body ? ya koi aur jagah se ?
     const { unique_id, product_name, cost_price } = req.body;
     if (
@@ -81,9 +81,13 @@ exports.addProduct = async (req, res) => {
       cost_price,
     });
 
-    console.log("NEW PRODUCT was added : ", newProduct);
-    // console.log("COUNT OF PRODUCT: ", countOfProduct);
-
+    // Emit the event to notify clients that a product was added
+    if (io) {
+      // Check if io is defined before calling emit
+      io.emit("productAdded"); // Emit the event to all connected clients
+    } else {
+      console.error("Socket.io instance is undefined.");
+    }
     res.status(201).json({
       status: "success",
       data: {
