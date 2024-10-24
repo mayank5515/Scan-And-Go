@@ -3,7 +3,7 @@ import TotalItem from "./TotalItem";
 export default function TotalList({ products }) {
   console.log("PRODUCTS FROM TOTAL LIST", products);
   return (
-    <div className="border-2 border-red-400 flex-grow flex-col space-y-1 p-1 overflow-y-scroll">
+    <div className=" flex-grow flex-col space-y-1 p-1 overflow-y-scroll">
       {products.map((el, i) => {
         return (
           <div key={i}>
