@@ -6,6 +6,18 @@ exports.getAllProducts = async (req, res) => {
   try {
     //BASICALLY WE NEED TO GROUP BY unique_id and then count the number of occurences of each product
     //and send back all products with their respective quantities
+
+    //check if data base is empty or not ?
+    const count = await Product.countDocuments();
+    // console.log("count", count);
+    if (count === 0) {
+      return res.status(204).json({
+        status: "success",
+        message: "No products found in the database",
+        data: [],
+      });
+    }
+
     const products = await Product.aggregate([
       {
         $group: {
@@ -106,6 +118,7 @@ exports.addProduct = async (req, res, io) => {
 //DELETE ALL PRODUCTS
 exports.deleteAllProducts = async (req, res) => {
   try {
+    console.log("DELETE REQUEST made");
     await Product.deleteMany();
     res.status(204).json({
       status: "success",
