@@ -2,17 +2,19 @@ import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 // import toast from "react-hot-toast";
+import io from "socket.io-client";
 
 import ProductListComp from "../components/ShoppingListComponents/ProductListComp.jsx";
-import TotalItem from "../components/ShoppingListComponents/Total.jsx";
 import Total from "../components/ShoppingListComponents/Total.jsx";
-import TotalList from "../components/TotalComponents/TotalList.jsx";
+
+const URL = "http://localhost:3000";
+const socket = io(URL);
+
 export default function ShoppingListPage() {
   //CONSUMING CONTEXT
   const [products, setProducts] = useState([]);
   const [totalBill, setTotalBill] = useState(0);
   // const URL = `http://192.168.179.131:3000`;
-  const URL = "http://localhost:3000";
   useEffect(() => {
     const fetchAllProducts = async () => {
       try {
@@ -28,7 +30,20 @@ export default function ShoppingListPage() {
         console.log(err);
       }
     };
+    //Fetch products on component mount
     fetchAllProducts();
+
+    // Listen for product updates from the server
+    socket.on("productAdded", () => {
+      console.log("Product update detected . Fetching latest products");
+      fetchAllProducts();
+    });
+
+    //Cleanup the socket connection when the component unmounts
+    return () => {
+      // socket.disconnect();
+      socket.off("productAdded");
+    };
   }, []);
 
   return (
