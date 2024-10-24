@@ -1,7 +1,7 @@
 import React from "react";
 import TotalItem from "./TotalItem";
 export default function TotalList({ products }) {
-  console.log("PRODUCTS FROM TOTAL LIST", products);
+  // console.log("PRODUCTS FROM TOTAL LIST", products);
   return (
     <div className=" flex-grow flex-col space-y-1 p-1 overflow-y-scroll">
       {products.map((el, i) => {

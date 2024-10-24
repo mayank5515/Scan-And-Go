@@ -40,7 +40,10 @@ export default function Total({ totalBill, products }) {
           </button> */}
           <button
             onClick={handleNavigate}
-            className="w-full  flex justify-center items-center text-white bg-green-600 text-[20px] font-semibold rounded-sm  px-2 py-1 hover:bg-green-500 active:bg-green-700 transition duration-200 ease-in-out"
+            disabled={totalBill === 0}
+            className={`${
+              totalBill === 0 && "disabled:opacity-75 cursor-not-allowed"
+            } w-full  flex justify-center items-center text-white bg-green-600 text-[20px] font-semibold rounded-sm  px-2 py-1 hover:bg-green-500 active:bg-green-700 transition duration-200 ease-in-out`}
           >
             Checkout
           </button>
