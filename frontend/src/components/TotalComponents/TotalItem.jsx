@@ -1,14 +1,16 @@
 import React from "react";
 
-export default function Item({ product_name, cost_price = 0, quantity = 0 }) {
+export default function TotalItem({
+  product_name,
+  cost_price = 0,
+  quantity = 0,
+}) {
   const total = cost_price * quantity;
   return (
     <div
-      className={`border-2 p-1 border-black flex justify-between ${
-        total === 0 ? "hidden" : ""
-      }`}
+      className={`py-1  flex justify-between ${total === 0 ? "hidden" : ""}`}
     >
-      <p className="text-black text-[16px] font-medium">{product_name}</p>
+      <p className=" text-[16px] font-medium">{product_name}</p>
       <div className="flex space-x-1 font-medium">
         <p>Rs: {cost_price || 0}</p>
         <p>x</p>

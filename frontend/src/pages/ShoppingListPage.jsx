@@ -1,20 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import toast from "react-hot-toast";
-import {
-  removeProduct,
-  updateProductQuantity,
-  productData,
-} from "../data/productData.js";
+// import toast from "react-hot-toast";
 
 import ProductListComp from "../components/ShoppingListComponents/ProductListComp.jsx";
+import TotalItem from "../components/ShoppingListComponents/Total.jsx";
 import Total from "../components/ShoppingListComponents/Total.jsx";
+import TotalList from "../components/TotalComponents/TotalList.jsx";
 export default function ShoppingListPage() {
+  //CONSUMING CONTEXT
   const [products, setProducts] = useState([]);
   const [totalBill, setTotalBill] = useState(0);
-  //
-  const URL = `http://192.168.179.131:3000`;
+  // const URL = `http://192.168.179.131:3000`;
+  const URL = "http://localhost:3000";
   useEffect(() => {
     const fetchAllProducts = async () => {
       try {
@@ -38,11 +36,11 @@ export default function ShoppingListPage() {
       <h1 className="text-black text-[30px] text-center mb-2">
         Shopping List 🛒
       </h1>
-      <div className="border-4 border-green-600 p-2 h-[85vh] flex flex-col lg:flex-row ">
+      <div className="border-4 border-green-600 p-1 h-[85vh] flex flex-col lg:flex-row ">
         {/* LIST OF ITEMS */}
         <ProductListComp products={products} />
         {/* TOTAL BILL */}
-        <Total totalBill={totalBill} />
+        <Total totalBill={totalBill} products={products} />
       </div>
     </section>
   );

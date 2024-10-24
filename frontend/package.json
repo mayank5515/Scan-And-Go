@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    //  to allow other computer connected to same hotspot as me , to open react app that is running in my computer. react app is made with vite
+   
     "dev": "vite --host",
     "build": "vite build",
     "lint": "eslint .",
