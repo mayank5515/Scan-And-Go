@@ -3,13 +3,12 @@ import TotalList from "../TotalComponents/TotalList";
 export default function Total({ totalBill, products }) {
   return (
     <div className="  lg:h-auto border-2 border-gray-500 lg:ml-1 p-1 lg:w-[30vw] flex flex-col  flex-grow">
-      <div className=" hidden  lg:flex flex-col h-[75vh] overflow-y-scroll">
+      <div className=" hidden  lg:flex flex-col h-[75vh] overflow-y-scroll border-b-2  border-black">
         <TotalList products={products} />
       </div>
 
       {/* CHECKOUT */}
       <section className="">
-        <hr className="border-[1px] border-black" />
         <div className="mt-1 flex-grow   flex justify-between items-center p-1 ">
           <h1 className="text-black text-[20px] font-semibold">Total</h1>
           <p className="text-black text-[20px]"> Rs: {totalBill || 0}</p>
