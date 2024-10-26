@@ -3,6 +3,7 @@ import ShoppingListPage from "./pages/ShoppingListPage";
 import BillPage from "./pages/BillPage";
 import { io } from "socket.io-client";
 import { useEffect } from "react";
+import { Toaster } from "react-hot-toast";
 function App() {
   //   useEffect(() => {
   //     // Connect to the Socket.io server
@@ -31,6 +32,7 @@ function App() {
           <Route path="/bill" element={<BillPage />} />
         </Routes>
       </div>
+      <Toaster />
     </>
   );
 }

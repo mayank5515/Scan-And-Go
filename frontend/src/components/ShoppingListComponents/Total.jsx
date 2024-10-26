@@ -5,11 +5,11 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 export default function Total({ totalBill, products }) {
   const navigate = useNavigate();
+  const URL = `http://192.168.179.131:3000`;
+  // const URL = `http://localhost:3000`;
   const deleteAllProducts = async () => {
     try {
-      const response = axios.delete(
-        "http://localhost:3000/api/v1/products/checkout"
-      );
+      const response = axios.delete(URL + "/api/v1/products/checkout");
       console.log("DELETE RESPONSE: ", response);
       console.log("DELETE RESPONSE DATA: ", response.data);
     } catch (err) {

@@ -6,16 +6,15 @@ import io from "socket.io-client";
 
 import ProductListComp from "../components/ShoppingListComponents/ProductListComp.jsx";
 import Total from "../components/ShoppingListComponents/Total.jsx";
-import TotalList from "../components/TotalComponents/TotalList.jsx";
 
-const URL = "http://localhost:3000";
+// const URL = "http://localhost:3000";
+const URL = `http://192.168.179.131:3000`;
 const socket = io(URL);
 
 export default function ShoppingListPage() {
   //CONSUMING CONTEXT
   const [products, setProducts] = useState([]);
   const [totalBill, setTotalBill] = useState(0);
-  // const URL = `http://192.168.179.131:3000`;
   useEffect(() => {
     const fetchAllProducts = async () => {
       try {
@@ -23,12 +22,14 @@ export default function ShoppingListPage() {
         const Objdata = response.data;
         const { total } = Objdata;
         if (response.status === 204) {
+          setProducts([]);
           return toast.error("Please add items to your cart 🛒");
         }
-        console.log(Objdata, total, Objdata.data);
+        // console.log(Objdata, total, Objdata.data);
         // const newProducts=Objdata.data.((el,i) => { });
         setProducts(Objdata.data); //array store ho rha h
         setTotalBill(total);
+        // toast.success("Item added to cart!!");
         // console.log(products);
       } catch (err) {
         console.log(err);
