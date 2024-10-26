@@ -1,9 +1,19 @@
 //NOTE: YHA PE DATA ESP32 se aaega and hum usko uske respective bill m dalenge
 
 const Product = require("../models/Product.models");
+const State = require("../models/State.model");
+
 //GET ALL PRODUCTS -> DYNAMIC IN NATURE USING SOCKET.IO
 exports.getAllProducts = async (req, res) => {
   try {
+    // console.log("entered here");
+    //CREATE NEW (only one) state if not created
+    const existingState = await State.findOne({ name: "removeActive" });
+    if (!existingState) {
+      await State.create({ name: "removeActive", value: false });
+    }
+    // console.log("state created", !existingState); //will show false if state already exists
+    //
     //BASICALLY WE NEED TO GROUP BY unique_id and then count the number of occurences of each product
     //and send back all products with their respective quantities
 
@@ -64,6 +74,7 @@ exports.getAllProducts = async (req, res) => {
 
 //ADD NEW PRODUCT
 exports.addProduct = async (req, res, io) => {
+  // console.log("ENTERED IN ADD PRODUCT");
   try {
     // console.log("IO FROM ADD PRODUCT", io); // Check if io is defined
     //ALERT: product aaega kha se ? req.body ? ya koi aur jagah se ?
@@ -80,19 +91,40 @@ exports.addProduct = async (req, res, io) => {
           "Product is required , please mention all the details (unique_id, product_name, cost_price)",
       });
     }
-    //if product already exists ? then check how many times it has been added
 
-    // const countOfProduct = await Product.aggregate([
-    //   { $match: { unique_id: req.body.unique_id } },
-    //   { $group: { _id: "$unique_id", countDocuments: { $sum: 1 } } },
-    // ]);
+    // console.log("from add product: ", req.body);
 
-    const newProduct = await Product.create({
-      unique_id,
-      product_name,
-      cost_price,
-    });
+    //HERE  create if and else , and depending on that call different mongoose functions
 
+    const existingState = await State.findOne({ name: "removeActive" });
+    if (!existingState) {
+      await State.create({ name: "removeActive", value: false });
+    }
+    console.log("from add: ", existingState.value);
+    if (existingState && existingState.value === true) {
+      const deletedProduct = await Product.findOneAndDelete({
+        unique_id: unique_id,
+      });
+      console.log(deletedProduct, "deleted Product");
+      res.status(204).json({
+        status: "success",
+        data: null,
+      });
+    } else {
+      const newProduct = await Product.create({
+        unique_id,
+        product_name,
+        cost_price,
+      });
+      console.log("ADDED A PRODUCT!!");
+      res.status(201).json({
+        status: "success",
+        data: {
+          data: newProduct,
+          // quantity: countOfProduct,
+        },
+      });
+    }
     // Emit the event to notify clients that a product was added
     if (io) {
       // Check if io is defined before calling emit
@@ -100,13 +132,6 @@ exports.addProduct = async (req, res, io) => {
     } else {
       console.error("Socket.io instance is undefined.");
     }
-    res.status(201).json({
-      status: "success",
-      data: {
-        data: newProduct,
-        // quantity: countOfProduct,
-      },
-    });
   } catch (err) {
     res.status(400).json({
       status: "fail",

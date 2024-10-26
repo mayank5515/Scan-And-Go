@@ -11,7 +11,7 @@ connectDB();
 
 const server = require("http").createServer(app);
 
-initSocket(server);
+initSocket(server); 
 // console.log("IO FROM SERVER", io);
 // Log when a client connects
 

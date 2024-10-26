@@ -13,7 +13,6 @@ router
   .get(getAllProducts)
   .post((req, res) => {
     const io = getSocket(); // Get the io instance
-    // console.log("IO FROM ROUTE", io);
     addProduct(req, res, io); //pass io to the controller
   });
 
