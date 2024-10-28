@@ -5,7 +5,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const productRouter = require("./routes/product.route");
 const stateRouter = require("./routes/state.route");
-const userRouter = require("./routes/user.route");
+const authRouter = require("./routes/auth.route");
 
 dotenv.config({ path: "./config.env" });
 
@@ -36,7 +36,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/api/v1/products", productRouter);
-app.use("/api/v1/users", userRouter);
+app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/toggleState", stateRouter);
 
 module.exports = app;
