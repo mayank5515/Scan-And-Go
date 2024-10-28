@@ -19,6 +19,7 @@ const UserSchema = new mongoose.Schema(
     activeBill: {
       type: mongoose.Schema.ObjectId,
       ref: "Bill",
+      default: null,
     },
     bills: [
       {

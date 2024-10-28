@@ -6,7 +6,7 @@ const State = require("../models/State.model");
 //GET ALL PRODUCTS -> DYNAMIC IN NATURE USING SOCKET.IO
 exports.getAllProducts = async (req, res) => {
   try {
-    // console.log("entered here");
+    console.log("in get all products: ", req, " and: ", req.user);
     //CREATE NEW (only one) state if not created
     const existingState = await State.findOne({ name: "removeActive" });
     if (!existingState) {

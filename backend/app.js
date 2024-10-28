@@ -39,4 +39,8 @@ app.use("/api/v1/products", productRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/toggleState", stateRouter);
 
+app.use((err, req, res, next) => {
+  console.log("ERROR: ", err, err.stack, err.name, err.message);
+  next();
+});
 module.exports = app;
