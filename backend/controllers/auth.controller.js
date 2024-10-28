@@ -32,6 +32,7 @@ const createSendToken = (res, user) => {
   res.cookie("jwt", token, cookieOptions);
 };
 
+/////////////////////////////////////////////////////////////////////////////////
 //SEND OTP
 exports.sendOtp = async (req, res) => {
   try {
@@ -48,11 +49,12 @@ exports.sendOtp = async (req, res) => {
 
     const cDate = new Date();
     //IF USER EXISTS UPDATE OTP AND OTP EXPIRES IN FIELD , ELSE CREATE NEW USER WITH THESE VALUE (that's what upsert is used for)
+
     const user = await User.findOneAndUpdate(
       { phone_number },
       {
         otp: encryptedOTP,
-        otpExpiresIn: new Date(cDate.getTime()),
+        otpExpiresIn: new Date(cDate.getTime() + 5 * 60 * 1000), //expires in 5 min
       },
       {
         upsert: true,
@@ -64,7 +66,7 @@ exports.sendOtp = async (req, res) => {
     console.log("OTP is : ", otp);
     //SEND OTP TO CLIENT USING TWILIO
     await twilioClient.messages.create({
-      body: `Your OTP is :${otp}`,
+      body: `Your OTP is :${otp} , your OTP is valid for 5 mins`,
       to: phone_number,
       from: twilioPhoneNumber,
     });
@@ -83,6 +85,7 @@ exports.sendOtp = async (req, res) => {
     });
   }
 };
+/////////////////////////////////////////////////////////////////////////////////
 //VERIFY OTP AND SEND BACK JWT AS COOKIE
 exports.verifyOtp = async (req, res) => {
   try {
@@ -106,14 +109,14 @@ exports.verifyOtp = async (req, res) => {
       });
     }
     //IF OTP EXPIRED
-    if (await otpValidateTime(existingUser.otpExpiresIn)) {
+    if (!(await otpValidateTime(existingUser.otpExpiresIn))) {
       return res.status(400).json({
         status: "fail",
         message: "Your OTP has been expired , please request for new OTP",
       });
     }
     //IF EVERYTHING IS OK , SEND BACK JWT AS COOKIE (WE WILL USE THIS FOR FURTHER AUTHORIZATION (protect method ke through))
-    console.log("EXISTING USER: ", existingUser);
+    // console.log("EXISTING USER: ", existingUser);
     createSendToken(res, existingUser);
 
     res.status(200).json({
@@ -129,6 +132,7 @@ exports.verifyOtp = async (req, res) => {
   }
 };
 
+/////////////////////////////////////////////////////////////////////////////////
 //PROTECT ROUTE -> AUTHORIZATION
 exports.protect = async (req, res, next) => {
   try {
@@ -180,3 +184,11 @@ exports.protect = async (req, res, next) => {
     });
   }
 };
+
+// console.log("cdate: ", cDate);
+// console.log("cDate in milliseconds", cDate.getTime());
+// console.log("15 mins ahead in mill", cDate.getTime() + 15 * 60 * 1000);
+// console.log(
+//   "15 mins ahead in date",
+//   new Date(cDate.getTime() + 15 * 60 * 1000)
+// );
