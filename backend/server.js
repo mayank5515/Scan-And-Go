@@ -11,7 +11,7 @@ connectDB();
 
 const server = require("http").createServer(app);
 
-initSocket(server); 
+initSocket(server);
 // console.log("IO FROM SERVER", io);
 // Log when a client connects
 
@@ -21,4 +21,11 @@ mongoose.connection.once("open", () => {
   server.listen(PORT, "0.0.0.0", () => {
     console.log(`Server is running on port ${PORT}`);
   });
+});
+
+process.on("uncaughtException", (err) => {
+  if (err instanceof AggregateError) {
+    console.error("Error :::: ", err.cause);
+  }
+  console.error(err, err.name, err.message);
 });

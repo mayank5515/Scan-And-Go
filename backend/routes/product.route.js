@@ -6,11 +6,13 @@ const {
   deleteAllProducts,
 } = require("../controllers/product.controller");
 
+const authController = require("../controllers/auth.controller");
+
 const router = express.Router();
 
 router
   .route("/")
-  .get(getAllProducts)
+  .get(authController.protect, getAllProducts) //added authorization here
   .post((req, res) => {
     const io = getSocket(); // Get the io instance
     addProduct(req, res, io); //pass io to the controller
