@@ -4,12 +4,35 @@ const Bill = require("../models/Bill.models");
 //this will be called initially only
 exports.createActiveBill = async (req, res) => {
   try {
-    console.log("REQ USER: ", req.user);
-    console.log("HEADERS: ", req.headers);
-
+    // console.log("REQ USER: ", req.user);
+    // console.log("HEADERS: ", req.headers);
+    if (req.user && req.user.activeBill === null) {
+      const newBill = await Bill.findOneAndUpdate(
+        {
+          customer_id: req.user._id,
+        },
+        {
+          customer_id: req.user._id,
+          total_amount: 0,
+          products: [],
+        },
+        {
+          upsert: true,
+          new: true,
+          setDefaultsOnInsert: true,
+        }
+      );
+      // console.log("NEW BILL: ", newBill);
+      //UPDATE USER WITH ACTIVE BILL
+      req.user.activeBill = newBill._id;
+      await req.user.save();
+    }
     res.status(200).json({
       status: "success",
       message: "Bill created successfully",
+      data: {
+        bill: req.user.activeBill,
+      },
     });
   } catch (err) {
     res.status(400).json({

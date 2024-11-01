@@ -6,7 +6,7 @@ const billSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "User",
     },
-    products_list: [
+    products: [
       {
         type: mongoose.Schema.ObjectId,
         ref: "Product",

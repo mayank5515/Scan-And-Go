@@ -92,7 +92,7 @@ exports.addProduct = async (req, res, io) => {
       });
     }
 
-    // console.log("from add product: ", req.body);
+    console.log("from add product: ", req.user);
 
     //HERE  create if and else , and depending on that call different mongoose functions
 
