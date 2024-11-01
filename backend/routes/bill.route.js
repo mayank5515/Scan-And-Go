@@ -4,7 +4,9 @@ const billController = require("../controllers/bill.controller");
 
 const router = express.Router();
 
-router.route("/:id").get(billController.getBill); //will change
+router
+  .route("/currentBill")
+  .get(authController.protect, billController.getActiveBill); //will change
 //maybe socket io issi route pe call krega baar baar to check if shopping list me kuch update hua hai
 
 router

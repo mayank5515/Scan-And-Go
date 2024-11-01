@@ -14,6 +14,7 @@ const billSchema = new mongoose.Schema(
     ],
     total_amount: {
       type: Number,
+      default: 0,
     },
   },
   {

@@ -1,0 +1,32 @@
+OK SO 
+
+
+
+
+
+BILL KE MODEL M EK PROPERTY H TOTAL AMOUNT JO UPDATE KRTA REH RHA HU , SO THAT KHI AUR BILL ko access kru kisi aur controller m toh baar baar aggregate function na lgana pde
+
+
+PRODUCT CONTROLLERS - WHAT ARE THEY DOING ?
+
+-> addProduct 
+- First user must be logged in , protect middelware check krega ye , and if user is logged in , send user data with req.user 
+- Second check if user doesnt have activeBill property as null , If it is return bad auth response
+- Ye active bill null na ho ye bill ke controllers dekh rhe -> for more clarity check createActiveBill controller ka logic issi .txt file m 
+- Anyway if active bill is not null , I did 6 things 
+-------- 1) CREATE NEW PRODUCT DOC IN DATABASE WITH bill_id prop as currentBill bill_id
+-------- 2) GET CURRENT ACTIVE BILL FROM DATABASE -> basically findById
+-------- 3) GET TOTAL COST OF ALL THE PRODUCTS PRESENT IN BILL , and add current cost price of current product to that (check if there were no products present before what will i get)
+-------- 4) UPDATING AND SAVING TO DATABASE TOTAL AMOUNT PROPERTY OF BILL and push newProduct to products property of bill
+-------- 5) EMIT THE EVENT to notify clients that a product was added
+
+-> getAllProducts 
+-> When it will be called ? This will be called multiple times (from client side) , whenever any product is added or removed
+- First user must be logged in , protect middelware check krega ye , and if user is logged in , send user data with req.user 
+- Second check if user doesnt have activeBill property as null , If it is return bad auth response 
+- Anyway if active bill is not null , do these things
+---------- 1) CHECK IF DATABASE IS NOT EMPTY -> IF IT IS SEND DIFFERENT response
+---------- 2) GET CURRENT BILL DOCUMENT -> SO THAT I CAN SEND BACK total_amount property of currentBill back as well with other data
+---------- 3) GET PRODUCTS GROUPED BY BILL AND QUANTITY (AGGREGATE) -> THIS IS CRUCIAL (HERE I AM STRUCTURING HOW I AM GOING TO REPRESENT THIS AGGREGATED DATA)
+------- Basically all the products belonging to my current_bill id should be grouped together , and laterwards they should be grouped together again in such a way that there are no duplicate documents , Quantity property is added here to represent occurence of documents with same "unique_id" 
+---------- 4) SEND BACK THIS AGGREGATED RESULT
