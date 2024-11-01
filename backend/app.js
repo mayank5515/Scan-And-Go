@@ -6,10 +6,10 @@ const dotenv = require("dotenv");
 const productRouter = require("./routes/product.route");
 const stateRouter = require("./routes/state.route");
 const authRouter = require("./routes/auth.route");
+const billRouter = require("./routes/bill.route");
 
 dotenv.config({ path: "./config.env" });
 
-// console.log(process.env);
 const app = express();
 
 app.use(express.json());
@@ -36,6 +36,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/api/v1/products", productRouter);
+app.use("/api/v1/bills", billRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/toggleState", stateRouter);
 

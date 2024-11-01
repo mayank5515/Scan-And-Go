@@ -16,7 +16,7 @@ const twilioClient = require("twilio")(accountSID, authToken);
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: Date.now() + 60 * 60 * 1000,
+    expiresIn: "2h",
   });
 };
 
@@ -24,7 +24,7 @@ const createSendToken = (res, user) => {
   const token = signToken(user._id);
   //SENDING JWT VIA A COOKIE
   const cookieOptions = {
-    expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    expires: new Date(Date.now() + 24 * 60 * 60 * 1000), //24 hours
     httpOnly: true, //browser will recieve , store and send back cookie but WONT BE ABLE TO ACCESS IT ANY WAY
   };
   //   if (process.env.NODE_ENV === "production") cookieOptions.secure = true; //WILL ONLY SEND COOKIE ON ENCRYPTED NETWORK

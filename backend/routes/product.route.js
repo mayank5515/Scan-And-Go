@@ -10,9 +10,11 @@ const authController = require("../controllers/auth.controller");
 
 const router = express.Router();
 
+// const io = getSocket();
 router
   .route("/")
   .get(authController.protect, getAllProducts) //added authorization here
+  // .post(addProduct(req, res, io));
   .post((req, res) => {
     const io = getSocket(); // Get the io instance
     addProduct(req, res, io); //pass io to the controller
