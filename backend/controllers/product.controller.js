@@ -52,6 +52,14 @@ exports.getAllProducts = async (req, res) => {
     if (!existingState) {
       await State.create({ name: "removeActive", value: false });
     }
+
+    if (req.user.activeBill === null) {
+      return res.status(400).json({
+        status: "fail",
+        message: "No active bill found , Please create a bill first",
+      });
+    }
+
     // console.log("state created", !existingState); //will show false if state already exists
     //
     //BASICALLY WE NEED TO GROUP BY unique_id and then count the number of occurences of each product
@@ -133,9 +141,11 @@ exports.addProduct = async (req, res, io) => {
     if (existingState && existingState.value === true) {
       //state is true , remove the product
       const deletedProduct = await Product.findOneAndDelete({
+        bill_id: req.user.activeBill,
         unique_id: unique_id,
       });
-      console.log(deletedProduct, "deleted Product");
+      console.log("deleted Product", deletedProduct);
+
       res.status(204).json({
         status: "success",
         data: null,
@@ -152,38 +162,44 @@ exports.addProduct = async (req, res, io) => {
       const currBill = await Bill.findById(req.user.activeBill);
       //3) GET TOTAL COST OF PRODUCTS FOR THE CURRENT BILL
       //IMP: AGGREGATE IS USED TO CALCULATE SUM OF ALL PRODUCTS COST PRICE
-      const totalAmount = await Bill.aggregate([
-        {
-          $match: {
-            _id: currBill._id,
+      let totalAmount = 0;
+      if (!currBill || currBill.products.length !== 0) {
+        //IF PRODUCTS ARRAY IS EMPTY , AGGREGATE WILL THROW ERROR , SO CHECKING FOR THAT
+        totalAmount = await Bill.aggregate([
+          {
+            $match: {
+              _id: currBill._id,
+            },
           },
-        },
-        {
-          $lookup: {
-            from: "products",
-            localField: "products",
-            foreignField: "_id",
-            as: "products",
+          {
+            $lookup: {
+              from: "products",
+              localField: "products",
+              foreignField: "_id",
+              as: "products",
+            },
           },
-        },
-        {
-          $unwind: "$products",
-        },
-        {
-          $group: {
-            _id: "$_id",
-            total_bill: { $sum: "$products.cost_price" },
+          {
+            $unwind: "$products",
           },
-        },
-      ]);
-
-      const actualTotal = totalAmount[0].total_bill + newProduct.cost_price;
-
+          {
+            $group: {
+              _id: "$_id",
+              total_bill: { $sum: "$products.cost_price" },
+            },
+          },
+        ]);
+        totalAmount = totalAmount[0].total_bill;
+      }
+      // console.log("newProduct: ", newProduct);
+      // console.log("currBill before : ", currBill);
+      const actualTotal = totalAmount + newProduct.cost_price;
       //4) SAVING PRODUCT ID and UPDATED TOTAL IN BILL
       currBill.products.push(newProduct._id);
       currBill.total_amount = actualTotal;
       await currBill.save();
       console.log("currBill: ", currBill);
+
       res.status(201).json({
         status: "success",
         message: "Product added successfully",
