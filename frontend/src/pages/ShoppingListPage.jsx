@@ -7,8 +7,8 @@ import io from "socket.io-client";
 import ProductListComp from "../components/ShoppingListComponents/ProductListComp.jsx";
 import Total from "../components/ShoppingListComponents/Total.jsx";
 
-// const URL = "http://localhost:3000";
-const URL = `http://192.168.179.131:3000`;
+const URL = "http://localhost:3000";
+// const URL = `http://192.168.179.131:3000`;
 const socket = io(URL);
 
 export default function ShoppingListPage() {

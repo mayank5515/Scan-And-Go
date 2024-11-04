@@ -4,6 +4,9 @@ import BillPage from "./pages/BillPage";
 import { io } from "socket.io-client";
 import { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
+import LoginAndSignupPage from "./pages/LoginAndSignupPage";
+
+import PrivateRoute from "./components/PrivateRouteComponent/PrivateRoute";
 function App() {
   //   useEffect(() => {
   //     // Connect to the Socket.io server
@@ -28,7 +31,12 @@ function App() {
     <>
       <div className=" p-4 w-full h-screen bg-gray-100">
         <Routes>
-          <Route path="/" element={<ShoppingListPage />} />
+          <Route path="/" element={<LoginAndSignupPage />} />
+          <Route
+            path="/cart/*"
+            element={<PrivateRoute component={ShoppingListPage} />}
+          />
+          {/* <Route path="/cart" element={<ShoppingListPage />} /> */}
           <Route path="/bill" element={<BillPage />} />
         </Routes>
       </div>
