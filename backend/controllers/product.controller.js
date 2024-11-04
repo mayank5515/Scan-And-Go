@@ -77,13 +77,12 @@ exports.getAllProducts = async (req, res) => {
     }
     //2) GET CURRENT BILL DOCUMENT
     const currBill = await Bill.findById(req.user.activeBill);
-    console.log(currBill._id);
     //3) GET PRODUCTS GROUPED BY BILL AND QUANTITY (AGGREGATE)
     //-----getProductsGroupedByBillAndQuantity-----//
     const resultAgg = await getProductsGroupedByBillAndQuantity(currBill._id);
 
-    console.log("result: ", resultAgg);
-
+    console.log("result from getAllProducts: ", resultAgg);
+    //NOTE: CREATE CHECK CONDITION IF AGGREGRATE RETURNS EMPTY ARRAY , THEN SEND EMPTY ARRAY
     //4) GET TOTAL COST OF PRODUCTS FOR THE CURRENT BILL
 
     //4) SEND AGGREGRATED DATA
@@ -137,18 +136,46 @@ exports.addProduct = async (req, res, io) => {
     if (!existingState) {
       await State.create({ name: "removeActive", value: false });
     }
-    // console.log("from add: ", existingState.value);
+    console.log("Remove is ", existingState.value);
     if (existingState && existingState.value === true) {
+      //GET CURRENT BILL
+      const currBill = await Bill.findById(req.user.activeBill);
       //state is true , remove the product
-      const deletedProduct = await Product.findOneAndDelete({
+      let deletedProduct = await Product.findOne({
         bill_id: req.user.activeBill,
         unique_id: unique_id,
       });
-      console.log("deleted Product", deletedProduct);
+      console.log("deleted Product: ", deletedProduct);
 
-      res.status(204).json({
+      //also delete from bills product array
+      if (
+        deletedProduct !== null &&
+        deletedProduct !== undefined &&
+        currBill.products.length !== 0
+      ) {
+        console.log("REMOVE THE PRODUCT FROM PRODUCTS ARRAY TOO , ", currBill);
+        currBill.products = currBill.products.filter(
+          (product) => product.toString() !== deletedProduct._id.toString()
+        );
+        console.log("CURR BILL AFTER DELETION : ", currBill);
+      }
+      if (deletedProduct !== null && deletedProduct !== undefined) {
+        //WHAT IF HACKER , REMOVED FROM PRODUCTS ARRAY BUT NOT FROM PRODUCT COLLECTION
+        //DELETE THE PRODUCT
+        deletedProduct = await Product.findByIdAndDelete(deletedProduct._id);
+      }
+
+      //UPDATE TOTAL AMOUNT OF BILL -> IRRESPECTIVE OF IF ANYTHING WAS DELETED OR NOT
+      let newTotalAmount = await getTotalAmount(currBill);
+      // console.log("newTotalAmount: ", newTotalAmount);
+      currBill.total_amount = newTotalAmount;
+      await currBill.save();
+
+      res.status(200).json({
         status: "success",
-        data: null,
+        message: "Product deleted successfully",
+        data: deletedProduct,
+        bill: currBill,
       });
     } else {
       //1) CREATE NEW PRODUCT DOC
@@ -162,38 +189,12 @@ exports.addProduct = async (req, res, io) => {
       const currBill = await Bill.findById(req.user.activeBill);
       //3) GET TOTAL COST OF PRODUCTS FOR THE CURRENT BILL
       //IMP: AGGREGATE IS USED TO CALCULATE SUM OF ALL PRODUCTS COST PRICE
-      let totalAmount = 0;
-      if (!currBill || currBill.products.length !== 0) {
-        //IF PRODUCTS ARRAY IS EMPTY , AGGREGATE WILL THROW ERROR , SO CHECKING FOR THAT
-        totalAmount = await Bill.aggregate([
-          {
-            $match: {
-              _id: currBill._id,
-            },
-          },
-          {
-            $lookup: {
-              from: "products",
-              localField: "products",
-              foreignField: "_id",
-              as: "products",
-            },
-          },
-          {
-            $unwind: "$products",
-          },
-          {
-            $group: {
-              _id: "$_id",
-              total_bill: { $sum: "$products.cost_price" },
-            },
-          },
-        ]);
-        totalAmount = totalAmount[0].total_bill;
-      }
+      let totalAmount = await getTotalAmount(currBill);
+      console.log("TOTAL AMOUNT: ", totalAmount);
       // console.log("newProduct: ", newProduct);
       // console.log("currBill before : ", currBill);
       const actualTotal = totalAmount + newProduct.cost_price;
+
       //4) SAVING PRODUCT ID and UPDATED TOTAL IN BILL
       currBill.products.push(newProduct._id);
       currBill.total_amount = actualTotal;
@@ -236,4 +237,37 @@ exports.deleteAllProducts = async (req, res) => {
       message: err.message,
     });
   }
+};
+
+const getTotalAmount = async (currBill) => {
+  let totalAmount = 0;
+  if (!currBill || currBill.products.length !== 0) {
+    //IF PRODUCTS ARRAY IS EMPTY , AGGREGATE WILL THROW ERROR , SO CHECKING FOR THAT
+    totalAmount = await Bill.aggregate([
+      {
+        $match: {
+          _id: currBill._id,
+        },
+      },
+      {
+        $lookup: {
+          from: "products",
+          localField: "products",
+          foreignField: "_id",
+          as: "products",
+        },
+      },
+      {
+        $unwind: "$products",
+      },
+      {
+        $group: {
+          _id: "$_id",
+          total_bill: { $sum: "$products.cost_price" },
+        },
+      },
+    ]);
+    totalAmount = totalAmount[0].total_bill;
+  }
+  return totalAmount;
 };

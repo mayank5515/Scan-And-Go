@@ -30,3 +30,18 @@ PRODUCT CONTROLLERS - WHAT ARE THEY DOING ?
 ---------- 3) GET PRODUCTS GROUPED BY BILL AND QUANTITY (AGGREGATE) -> THIS IS CRUCIAL (HERE I AM STRUCTURING HOW I AM GOING TO REPRESENT THIS AGGREGATED DATA)
 ------- Basically all the products belonging to my current_bill id should be grouped together , and laterwards they should be grouped together again in such a way that there are no duplicate documents , Quantity property is added here to represent occurence of documents with same "unique_id" 
 ---------- 4) SEND BACK THIS AGGREGATED RESULT
+
+
+
+
+
+----> Workflow goes like this
+-> 1. User logs in / signs up
+-> 2. We send OTP to user
+-> 3. User verifies OTP
+-> 4. We send back JWT token as cookie to user
+-> 5. User sends JWT token in headers to access protected routes
+-> 6. If user is logged in (can access protected routes) -> We check if user has active bill or not
+-> 7. If user has active bill -> We send back response saying user has active bill
+-> 8. If user does not have active bill -> We create active bill for user , and save it in req.user.activeBill
+-> 9. After user has valid active bill -> User can add products / getAllProducts / delete products etc 
