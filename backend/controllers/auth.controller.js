@@ -37,6 +37,7 @@ const createSendToken = (res, user) => {
 exports.sendOtp = async (req, res) => {
   try {
     const { phone_number } = req.body;
+    console.log("PHONE NUMBER: ", req.body);
     //GENERATE OTP
     const otp = otpGenerator.generate(6, {
       lowerCaseAlphabets: false,
@@ -78,6 +79,7 @@ exports.sendOtp = async (req, res) => {
       user,
     });
   } catch (err) {
+    console.log(err);
     res.status(500).json({
       status: "fail",
       message: "Something went wrong!",

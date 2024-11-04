@@ -45,3 +45,7 @@ PRODUCT CONTROLLERS - WHAT ARE THEY DOING ?
 -> 7. If user has active bill -> We send back response saying user has active bill
 -> 8. If user does not have active bill -> We create active bill for user , and save it in req.user.activeBill
 -> 9. After user has valid active bill -> User can add products / getAllProducts / delete products etc 
+-> FIXED MAJOR ISSUE IN CREATE ACTIVE BILL
+
+--> Basically , i was doing findByIdAndUpdate() on active bill , and i was finding the bill document based on req.user._id . If user wants to create a new bill , but it has already created one bill in the past , then our query will rewrite older bill . and we will loose previous bill instance . Basically ek hee bill document pe kaam hoga hr baar.
+--> To fix this , i am creating new bill , if and only if activeBill property is null and user is logged in and updating user with new bill id. Otherwise , i will return req.user.activeBill.
