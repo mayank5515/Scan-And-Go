@@ -1,16 +1,14 @@
-import PropTypes from "prop-types";
 import ProductItem from "./ProductItem";
-import axios from "axios";
+import axios from "../../utils/axiosInstance";
 import { useEffect, useState } from "react";
 export default function ProductListComp({ products }) {
   const [isRemoveActive, setIsRemoveActive] = useState(false);
   // const URL = "http://localhost:3000";
-  const URL = `http://192.168.179.131:3000`;
+  // const URL = `http://192.168.179.131:3000`;
+  console.log("PRODUCTS FROM PRODUCT LIST COMP: ", products);
   const toggleStateToTrue = async () => {
     try {
-      const response = await axios.patch(
-        URL + "/api/v1/toggleState/removeItems"
-      );
+      const response = await axios.patch("/toggleState/removeItems");
       console.log(response, response.data);
       if (response.status === 200) setIsRemoveActive(true);
     } catch (err) {
@@ -20,7 +18,7 @@ export default function ProductListComp({ products }) {
 
   const toggleStateToFalse = async () => {
     try {
-      const response = await axios.patch(URL + "/api/v1/toggleState/addItems");
+      const response = await axios.patch("toggleState/addItems");
       console.log(response, response.data);
       if (response.status === 200) setIsRemoveActive(false);
     } catch (err) {
@@ -78,7 +76,7 @@ export default function ProductListComp({ products }) {
 //       currency: PropTypes.string.isRequired,
 //     })
 //   ).isRequired,
-//   handleDelete: PropTypes.func.isRequired,
-//   handleDecrement: PropTypes.func.isRequired,
-//   handleIncrement: PropTypes.func.isRequired,
+//   handleDelete: PropTypes.func,
+//   handleDecrement: PropTypes.func,
+//   handleIncrement: PropTypes.func,
 // };

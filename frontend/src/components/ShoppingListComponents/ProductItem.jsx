@@ -1,19 +1,13 @@
-import { RiDeleteBin7Line } from "react-icons/ri";
-import React from "react";
-import IncAndDecButtons from "./IncAndDecButtons";
 import ProductNameAndCost from "./productNameAndCost";
 
 export default function ProductItem({ id, product }) {
-  // console.log("productItem", product);
-  const { productDetails } = product;
-  // console.log("productDetails", productDetails);
-  // console.log("ID from : productItem", id);
+  console.log("PRODUCT FROM PRODUCT ITEM: ", product);
   return (
     <div className="flex-col border-2 rounded-xl p-2 bg-white">
       {/* PRODUCT NAME , COST , QUANTITY  */}
       <ProductNameAndCost
-        productName={product.productDetails.product_name}
-        cost={productDetails.cost_price}
+        productName={product.product_name}
+        cost={product.cost_price}
         quantity={product.quantity}
       />
       {/* <hr className="border-t " /> */}

@@ -10,13 +10,14 @@ function PrivateRoute({ component: Component, ...rest }) {
       try {
         const res = await axios.get("/auth/check-auth"); // Route that verifies JWT
         console.log("FROM CHECK AUTH:", res);
+        console.log(res.data);
         setIsAuthenticated(true);
       } catch {
         setIsAuthenticated(false);
       }
     };
     checkAuth();
-  }, []);
+  }, [isAuthenticated]);
 
   if (isAuthenticated === null) return <div>Loading...</div>;
 

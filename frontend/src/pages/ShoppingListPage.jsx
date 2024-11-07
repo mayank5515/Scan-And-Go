@@ -1,6 +1,5 @@
-import { useState, useEffect, useContext } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useState, useEffect } from "react";
+import axios from "../utils/axiosInstance";
 import toast from "react-hot-toast";
 import io from "socket.io-client";
 
@@ -8,7 +7,6 @@ import ProductListComp from "../components/ShoppingListComponents/ProductListCom
 import Total from "../components/ShoppingListComponents/Total.jsx";
 
 const URL = "http://localhost:3000";
-// const URL = `http://192.168.179.131:3000`;
 const socket = io(URL);
 
 export default function ShoppingListPage() {
@@ -16,21 +14,35 @@ export default function ShoppingListPage() {
   const [products, setProducts] = useState([]);
   const [totalBill, setTotalBill] = useState(0);
   useEffect(() => {
+    const createBill = async () => {
+      try {
+        const response = await axios.post("/bills/createbill");
+        console.log("CREATE BILL RESPONSE: ", response, response.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    createBill();
+  }, []);
+  useEffect(() => {
     const fetchAllProducts = async () => {
       try {
-        const response = await axios.get("" + URL + "/api/v1/products");
-        const Objdata = response.data;
-        const { total } = Objdata;
+        const response = await axios.get("/products");
+        const total = response.data.total;
+        const data = response.data.data;
         if (response.status === 204) {
           setProducts([]);
           return toast.error("Please add items to your cart 🛒");
         }
-        // console.log(Objdata, total, Objdata.data);
-        // const newProducts=Objdata.data.((el,i) => { });
-        setProducts(Objdata.data); //array store ho rha h
+        console.log("FETCH ALL PRODUCTS RESPONSE: ", response);
+        console.log(
+          "DATA FROM FETCH ALL PRODUCTS: ",
+          data,
+          " PRODUCTS: ",
+          data[0].products
+        );
+        setProducts(data[0].products);
         setTotalBill(total);
-        // toast.success("Item added to cart!!");
-        // console.log(products);
       } catch (err) {
         console.log(err);
       }

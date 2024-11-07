@@ -8,8 +8,8 @@ export default function TotalList({ products }) {
         return (
           <div key={i}>
             <TotalItem
-              product_name={el.productDetails.product_name}
-              cost_price={el.productDetails.cost_price}
+              product_name={el.product_name}
+              cost_price={el.cost_price}
               quantity={el.quantity}
             />
             {products.length - 1 !== i && <hr className="border-1 " />}
