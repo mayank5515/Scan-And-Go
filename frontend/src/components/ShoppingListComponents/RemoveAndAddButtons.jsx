@@ -7,7 +7,7 @@ export default function RemoveAndAddButtons({
 }) {
   return (
     <button
-      className={`border-2 bg-${bgColor}-600 p-2 text-white font-[16px]  rounded-md`}
+      className={`border-2 border-transparent bg-${bgColor}-600 p-2 text-white font-[16px]  rounded-md`}
       onClick={() => onClickFunction()}
     >
       {buttonText}
