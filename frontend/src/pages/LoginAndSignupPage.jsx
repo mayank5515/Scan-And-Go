@@ -2,16 +2,9 @@ import { useState } from "react";
 import axios from "../utils/axiosInstance";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-
-const appendCountryCode = (phoneNumber) => {
-  let usersPhoneNumber = phoneNumber;
-  if (usersPhoneNumber[0] !== "0") {
-    usersPhoneNumber = "0" + usersPhoneNumber;
-  }
-  usersPhoneNumber = usersPhoneNumber.replace(/^0/, "+91");
-  return usersPhoneNumber;
-};
-
+import appendCountryCode from "../utils/appendCountryCode";
+import Login_And_SignupBlock from "../components/LoginAndSignupComponents/LoginComponents/Login_And_SignupBlock";
+import LoginSideBar from "../components/LoginAndSignupComponents/LoginComponents/LoginSideBar";
 export default function LoginAndSignupPage() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [otp, setOtp] = useState("");
@@ -30,8 +23,12 @@ export default function LoginAndSignupPage() {
         }
       );
       console.log("RESPONSE FROM SEND OTP", res.data, res);
+      if (res.status === 200) {
+        toast.success("OTP sent successfully");
+      }
       setStep(2); // Move to OTP input
     } catch (error) {
+      toast.error("Error requesting OTP");
       console.error("Error requesting OTP", error);
     }
   };
@@ -51,8 +48,8 @@ export default function LoginAndSignupPage() {
       );
       console.log("RESPONSE FROM VERIFY OTP", response.data, response);
       // Store JWT in HTTP-only cookie managed by the server
-      toast.success("Logged in successfully");
       if (response.status === 200) {
+        toast.success("Logged in successfully");
         navigate("/cart");
       }
       // Handle further navigation or state management as needed
@@ -62,29 +59,41 @@ export default function LoginAndSignupPage() {
     }
   };
   return (
-    <div className="border-2 border-black p-2">
-      <div>
-        {step === 1 ? (
-          <div className="border-2 border-red-400 p-1">
-            <input
-              type="text"
-              placeholder="Enter phone number"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
+    <div className="border-2 border-black p-1 bg-gray-100  h-full w-full flex flex-col lg:flex-row justify-between">
+      <LoginSideBar step={step} phoneNumber={phoneNumber} />
+      <div className="border-2 border-blue-500 h-full w-full flex flex-col">
+        <div className="py-7">
+          {step === 1 ? (
+            <h1 className="text-center font-Barlow font-normal  text-[2rem]">
+              Login / Signup
+            </h1>
+          ) : (
+            <h1 className="text-center font-Barlow  text-[2rem]">
+              Please provide OTP, sent to your mobile !📲
+            </h1>
+          )}
+        </div>
+        <section className=" mt-2 border-2 border-black h-full">
+          {step === 1 ? (
+            <Login_And_SignupBlock
+              dynamicValue={phoneNumber}
+              requestFuncion={requestOtp}
+              onChangeFunction={setPhoneNumber}
+              placeholderText="Enter Phone Number"
+              buttonText="Request OTP"
+              buttonColor="red"
             />
-            <button onClick={requestOtp}>Send OTP</button>
-          </div>
-        ) : (
-          <div className="border-2 border-green-600">
-            <input
-              type="text"
-              placeholder="Enter OTP"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
+          ) : (
+            <Login_And_SignupBlock
+              dynamicValue={otp}
+              requestFuncion={verifyOtp}
+              onChangeFunction={setOtp}
+              placeholderText="Enter OTP here"
+              buttonText="Verify OTP"
+              buttonColor="green"
             />
-            <button onClick={verifyOtp}>Verify OTP</button>
-          </div>
-        )}
+          )}
+        </section>
       </div>
     </div>
   );
