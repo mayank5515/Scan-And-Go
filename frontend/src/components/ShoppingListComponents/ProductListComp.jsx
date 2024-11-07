@@ -5,11 +5,11 @@ import RemoveAndAddButtons from "./RemoveAndAddButtons";
 export default function ProductListComp({ products }) {
   const [isRemoveActive, setIsRemoveActive] = useState(false);
 
-  console.log("PRODUCTS FROM PRODUCT LIST COMP: ", products);
+  // console.log("PRODUCTS FROM PRODUCT LIST COMP: ", products);
   const toggleStateToTrue = async () => {
     try {
       const response = await axios.patch("/toggleState/removeItems");
-      console.log("RESPONSE FROM REMOVE ACTIVE: ", response, response.data);
+      // console.log("RESPONSE FROM REMOVE ACTIVE: ", response, response.data);
       if (response.status === 200) setIsRemoveActive(true);
     } catch (err) {
       console.log(err);
@@ -19,7 +19,7 @@ export default function ProductListComp({ products }) {
   const toggleStateToFalse = async () => {
     try {
       const response = await axios.patch("toggleState/addItems");
-      console.log("RESPONSE FROM REMOVE NOT ACTIVE: ", response, response.data);
+      // console.log("RESPONSE FROM REMOVE NOT ACTIVE: ", response, response.data);
       if (response.status === 200) setIsRemoveActive(false);
     } catch (err) {
       console.log(err);

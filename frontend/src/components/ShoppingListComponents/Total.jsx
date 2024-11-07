@@ -1,4 +1,3 @@
-import Item from "../TotalComponents/TotalItem";
 import TotalList from "../TotalComponents/TotalList";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";

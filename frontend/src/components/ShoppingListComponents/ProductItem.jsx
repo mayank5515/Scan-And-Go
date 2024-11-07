@@ -1,5 +1,5 @@
 export default function ProductItem({ id, product }) {
-  console.log("PRODUCT FROM PRODUCT ITEM: ", product);
+  // console.log("PRODUCT FROM PRODUCT ITEM: ", product);
   //IN THIS COMPONENT I CAN ADD OTHER DETAILS AS WELL LIKE PRODUCT DETAILS ,
   return (
     <div className="flex-col border-2 rounded-xl p-2 bg-white">
