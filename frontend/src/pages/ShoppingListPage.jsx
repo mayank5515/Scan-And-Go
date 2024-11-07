@@ -64,11 +64,9 @@ export default function ShoppingListPage() {
   }, []);
 
   return (
-    <section>
-      <h1 className="text-black text-[30px] text-center mb-2">
-        Shopping List 🛒
-      </h1>
-      <div className="border-4 border-green-600 p-1 h-[85vh] flex flex-col lg:flex-row ">
+    <section className="border-2 border-black ">
+      <h1 className="text-black text-[30px] text-center ">Shopping List 🛒</h1>
+      <div className="border-4 border-green-600 p-1 h-full flex flex-col lg:flex-row mt-1 ">
         {/* LIST OF ITEMS */}
         <ProductListComp products={products} />
         {/* TOTAL BILL */}
