@@ -7,10 +7,7 @@ const connectDB = async () => {
       "<DB_PASSWORD>",
       process.env.DB_PASSWORD
     );
-    const conn = await mongoose.connect(DB, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    const conn = await mongoose.connect(DB, {});
     console.log(`MongoDB connected: ${conn.connection.host}`);
   } catch (err) {
     console.error(`Error: ${err.message}`);

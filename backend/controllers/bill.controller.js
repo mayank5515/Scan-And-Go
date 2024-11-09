@@ -1,54 +1,76 @@
-const jwt = require("jsonwebtoken");
-const Bill = require("../models/Bill.models");
-const jwt = require("jsonwebtoken");
+const Bill = require("../models/Bill.model");
 
-const signToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: "25m",
+//FUNCTION
+// Function to remove duplicates and add quantity
+const processProducts = (products) => {
+  // Use a Map to group products by their unique_id
+  const productMap = new Map();
+
+  products.forEach((product) => {
+    const {
+      unique_id,
+      cost_price,
+      product_name,
+      bill_id,
+      createdAt,
+      updatedAt,
+    } = product;
+
+    // If the product is already in the Map, increment the quantity
+    if (productMap.has(unique_id)) {
+      const existingProduct = productMap.get(unique_id);
+      existingProduct.quantity += 1;
+    } else {
+      // If the product is not in the Map, add it with quantity set to 1
+      productMap.set(unique_id, {
+        _id: product._id,
+        bill_id,
+        product_name,
+        unique_id,
+        cost_price,
+        createdAt,
+        updatedAt,
+        __v: product.__v,
+        quantity: 1,
+      });
+    }
   });
-};
 
-const createSendToken = (res, statusCode, id) => {
-  const token = signToken(id);
-  //SENDING JWT VIA A COOKIE
-  const cookieOptions = {
-    expires: 25 * 60 * 1000,
-    // httpOnly: true, //browser will recieve , store and send back cookie but WONT BE ABLE TO ACCESS IT ANY WAY
-  };
-
-  res.cookie("jwt", token, cookieOptions);
-
-  // res.status(statusCode).json({
-  //   status: "success",
-  //   token,
-  // });
+  // Convert the Map values back to an array
+  return Array.from(productMap.values());
 };
 
 //CREATE NEW BILL
 //this will be called initially only
-exports.createBill = async (req, res) => {
+exports.createActiveBill = async (req, res) => {
   try {
-    const { phone_number, customer_name, shopping_list } = req.body;
-    if (!req.body.phone_number) {
-      return res.status(400).json({
-        status: "fail",
-        message: "Phone number is required",
+    console.log("REQ USER: ", req.user.activeBill !== null, !req.user);
+
+    if (req.user && req.user.activeBill === null) {
+      const newBill = await Bill.create({
+        customer_id: req.user._id,
+        products: [],
+        total_amount: 0,
       });
+      // console.log("NEW BILL: ", newBill);
+      //UPDATE USER WITH ACTIVE BILL , if only user doesnot have any active bill
+      req.user.activeBill = newBill._id;
+      await req.user.save();
     }
 
-    const newBill = await Bill.create({
-      phone_number,
-      customer_name,
-      shopping_list,
-    });
-
-    //as new bill is created send jwt token as cookie
-    createSendToken(res, 201, newBill._id); //this will be used to authenticate the customer and bill will be available for 25 mins for now
-
-    res.status(201).json({
+    if (req.user.activeBill !== null) {
+      console.log(
+        "USER ALREADY HAVE AN ACTIVE BILL , PLEASE REMOVE THAT FIRST"
+      );
+    }
+    if (req.user.activeBill === null) {
+      console.log("FIRST TIME CREATING BILL");
+    }
+    res.status(200).json({
       status: "success",
+      message: "Bill created successfully",
       data: {
-        newBill,
+        bill: req.user.activeBill,
       },
     });
   } catch (err) {
@@ -62,13 +84,28 @@ exports.createBill = async (req, res) => {
 //GET BILL
 // NOTE: this will be called multiple times in the frontend to see if anything was updated in shpping list
 //we will do this using socket.io
-exports.getBill = async (req, res) => {
+
+//NOTE: user must be logged in , only then we can getActiveBill
+//NOTE: maybe at the end send kr denge ye activeBill and getAllProducts waale controller se saare products for specific bill hee send krenge hr refetching m ,
+exports.getActiveBill = async (req, res) => {
   try {
-    console.log("FROM GET BILL: ", req.params);
-    const bill = await Bill.findById(req.params.id);
-    console.log("BILL: ", bill);
+    // console.log("REQ USER: ", req.user);
+    //
+    if (req.user.activeBill === null) {
+      return res.status(400).json({
+        status: "fail",
+        message: "No active bill found , Please create a bill first",
+      });
+    }
+    const bill = await Bill.findById(req.user.activeBill);
+    if (bill.products.length === 0) {
+      bill.total_amount = 0;
+      await bill.save();
+    }
+
     res.status(200).json({
       status: "success",
+      message: "Bill fetched successfully",
       data: {
         bill,
       },
@@ -77,7 +114,52 @@ exports.getBill = async (req, res) => {
     res.status(400).json({
       status: "fail",
       message: err.message,
-      err,
+      error: err,
+    });
+  }
+};
+
+exports.checkout = async (req, res) => {
+  try {
+    if (req.user.activeBill === null) {
+      return res.status(400).json({
+        status: "fail",
+        message: "No active bill found , Please create a bill first",
+      });
+    }
+    const currentBill = await Bill.findById(req.user.activeBill).populate(
+      "products"
+    );
+    let modifiedBill = currentBill;
+    if (currentBill.products.length !== 0) {
+      // Process the products array
+      const uniqueProducts = processProducts(currentBill.products);
+
+      // You may also want to update the total amount based on unique products
+      const updatedTotalAmount = uniqueProducts.reduce(
+        (sum, product) => sum + product.cost_price * product.quantity,
+        0
+      );
+
+      // Log or return the modified bill
+      modifiedBill = {
+        ...currentBill._doc, // spread existing properties of the bill document
+        products: uniqueProducts,
+        total_amount: updatedTotalAmount,
+      };
+    }
+
+    console.log("MODIFIED BILL: ", modifiedBill);
+
+    res.status(200).json({
+      status: "success",
+      message: "Bill fetched successfully",
+      data: modifiedBill,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
     });
   }
 };

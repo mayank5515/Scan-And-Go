@@ -1,79 +1,78 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  removeProduct,
-  updateProductQuantity,
-  productData,
-} from "../data/productData.js";
+import { useState, useEffect } from "react";
+import axios from "../utils/axiosInstance";
+import toast from "react-hot-toast";
+import io from "socket.io-client";
 
 import ProductListComp from "../components/ShoppingListComponents/ProductListComp.jsx";
-import TotalComponent from "../components/ShoppingListComponents/TotalComponent.jsx";
-export default function ShoppingListPage() {
-  const [products, setProducts] = useState([...productData]);
-  const [totalBill, setTotalBill] = useState(0);
-  function handleDelete(id) {
-    setProducts((prevProducts) => {
-      return prevProducts.filter((product, i) => {
-        if (product.id === id) {
-          removeProduct(id);
-          return false;
-        }
-        return true;
-      });
-    });
-  }
+import Total from "../components/ShoppingListComponents/Total.jsx";
 
-  function handleIncrement(id) {
-    setProducts((prevProducts) => {
-      return prevProducts.reduce((acc, product) => {
-        if (product.id === id) {
-          const newQuantity = product.quantity + 1; // Increment the quantity
-          updateProductQuantity(id, newQuantity); // Update the original array
-          // Add the updated product to the new array
-          return [...acc, { ...product, quantity: newQuantity }];
+const URL = "http://localhost:3000";
+const socket = io(URL);
+
+export default function ShoppingListPage() {
+  //CONSUMING CONTEXT
+  const [products, setProducts] = useState([]);
+  const [totalBill, setTotalBill] = useState(0);
+  useEffect(() => {
+    const createBill = async () => {
+      try {
+        const response = await axios.post("/bills/createbill");
+        console.log("CREATE BILL RESPONSE: ", response, response.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    createBill();
+  }, []);
+  useEffect(() => {
+    const fetchAllProducts = async () => {
+      try {
+        const response = await axios.get("/products");
+        const total = response.data.total;
+        const data = response.data.data;
+        if (response.status === 204) {
+          setProducts([]);
+          return toast.error("Please add items to your cart 🛒");
         }
-        // Keep other products in the state
-        return [...acc, product];
-      }, []); // Initial value for acc is an empty array
+        console.log("FETCH ALL PRODUCTS RESPONSE: ", response);
+        // console.log(
+        //   "DATA FROM FETCH ALL PRODUCTS: ",
+        //   data,
+        //   " PRODUCTS: ",
+        //   data[0].products
+        // );
+        setProducts(data[0].products);
+        setTotalBill(total);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    //Fetch products on component mount
+    fetchAllProducts();
+
+    // Listen for product updates from the server
+    socket.on("productAdded", () => {
+      console.log("Product update detected . Fetching latest products");
+      fetchAllProducts();
     });
-  }
-  function handleDecrement(id) {
-    setProducts((prevProducts) => {
-      // Create a copy of the products array to modify
-      return prevProducts.reduce((acc, product) => {
-        if (product.id === id) {
-          if (product.quantity === 1) {
-            removeProduct(id); // Remove from the original array
-            return acc; // Skip adding this product to the new array
-          } else {
-            const newQuantity = product.quantity - 1;
-            updateProductQuantity(id, newQuantity); // Update the original array
-            // Add the updated product to the new array
-            return [...acc, { ...product, quantity: newQuantity }];
-          }
-        }
-        // Keep other products in the state
-        return [...acc, product];
-      }, []);
-    });
-  }
+
+    //Cleanup the socket connection when the component unmounts
+    return () => {
+      // socket.disconnect();
+      socket.off("productAdded");
+    };
+  }, []);
 
   return (
-    <section>
-      <h1 className="text-black text-[30px] text-center mb-2">
-        Shopping List 🛒
-      </h1>
-      <div className="border-4 border-green-600 p-10">
+    <>
+      <h1 className="text-black text-[30px] text-center ">Shopping List 🛒</h1>
+      <div className="border-4 border-green-600 p-1 h-full flex flex-col lg:flex-row mt-1 ">
         {/* LIST OF ITEMS */}
-        <ProductListComp
-          products={products}
-          handleDelete={handleDelete}
-          handleDecrement={handleDecrement}
-          handleIncrement={handleIncrement}
-        />
+        <ProductListComp products={products} />
         {/* TOTAL BILL */}
-        <TotalComponent />
+        <Total totalBill={totalBill} products={products} />
       </div>
-    </section>
+    </>
   );
 }
