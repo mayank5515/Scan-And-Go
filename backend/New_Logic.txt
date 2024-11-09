@@ -49,3 +49,28 @@ PRODUCT CONTROLLERS - WHAT ARE THEY DOING ?
 
 --> Basically , i was doing findByIdAndUpdate() on active bill , and i was finding the bill document based on req.user._id . If user wants to create a new bill , but it has already created one bill in the past , then our query will rewrite older bill . and we will loose previous bill instance . Basically ek hee bill document pe kaam hoga hr baar.
 --> To fix this , i am creating new bill , if and only if activeBill property is null and user is logged in and updating user with new bill id. Otherwise , i will return req.user.activeBill.
+
+
+
+
+
+
+-> RAN INTO SOME PROBLEM REGARDING addProduct controller and protect middleware before it
+-> PROBLEM : 
+--> It slipped out of my mind that i need , req.user for proper functioning of addProduct controller
+--> Since esp32 is only sending product details , i need to get the user details somehow
+--> esp32 wont be able to pass protect middleware as it doesnt have jwt token 
+--> To provide esp32 with jwt token or user details , i need to create full duplex communication between esp32 and backend
+
+-> SOLUTION: 
+--> I created a new doc in DB for current user , which will be updated at the time of login and logout only
+--> This doc will contain the currently logged in user id and thats it
+--> It is similar to State model , as there will be only one doc in this collection
+--> When i logout i delete this doc , and when i login i create this doc
+--> This doc will be used by addProduct controller to get the user details
+---->I created new middleware , addProductProtect , which will be used by addProduct controller
+--> It's logic is based on the current user doc , if it exists then it will pass the control to next middleware
+
+CONS:
+->CURRENTY LOGGED IN USER ID IS STORED IN PLAIN TEXT , WHICH IS NOT SECURE
+->I am not ok with using doc to implement authentication , i will change it in future
