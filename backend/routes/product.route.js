@@ -15,7 +15,7 @@ router
   .route("/")
   .get(authController.protect, getAllProducts) //added authorization here
   // .post(addProduct(req, res, io));
-  .post(authController.protect, (req, res) => {
+  .post(authController.addProductProtected, (req, res) => {
     const io = getSocket(); // Get the io instance
     addProduct(req, res, io); //pass io to the controller
   });

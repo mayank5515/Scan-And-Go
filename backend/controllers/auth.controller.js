@@ -1,4 +1,5 @@
 const User = require("../models/User.model");
+const CurrUser = require("../models/CurrUser.model");
 const dotenv = require("dotenv");
 const otpGenerator = require("otp-generator");
 const bcrypt = require("bcrypt");
@@ -74,9 +75,7 @@ exports.sendOtp = async (req, res) => {
 
     res.status(200).json({
       status: "success",
-      message: `OTP sent successfully to ${phone_number}`,
-      encryptedOTP,
-      user,
+      message: `OTP sent successfully to ${phone_number} , Your OTP is valid for 5 mins !`,
     });
   } catch (err) {
     console.log(err);
@@ -166,6 +165,19 @@ exports.protect = async (req, res, next) => {
     }
     //SENDING BACK USER
     req.user = user;
+
+    ///////////////////////////////////////////////////////////////
+    //Extra logic to add current user to CurrUser model
+    const currentUser = await CurrUser.findOne({ name: "currentUser" });
+    if (!currentUser) {
+      const newUser = await CurrUser.create({
+        name: "currentUser",
+        curr_user: user._id,
+      });
+      await newUser.save();
+      console.log("NEW USER: ", newUser);
+    }
+    ///////////////////////////////////////////////////////////////
     next();
   } catch (err) {
     console.error(err);
@@ -195,6 +207,12 @@ exports.logout = async (req, res) => {
         message: "No active bill found , Please create a bill first",
       });
     }
+    // remove currUser from CurrUser model
+    const currentUser = await CurrUser.findOne({ name: "currentUser" });
+    if (!currentUser) currentUser.curr_user = null;
+    await currentUser.save();
+    //
+
     const currentBill = await Bill.findById(req.user.activeBill);
 
     // CONVERT ACTIVE BILL TO NULL AND PUSH IT TO BILLS ARRAY
@@ -218,6 +236,30 @@ exports.logout = async (req, res) => {
       status: "fail",
       message: "Something went wrong!",
       error: err,
+    });
+  }
+};
+
+//-------------------------------------------------------------------------------------------------------------------//
+exports.addProductProtected = async (req, res, next) => {
+  try {
+    const currentUser = await CurrUser.findOne({ name: "currentUser" });
+    if (!currentUser || currentUser.curr_user === null) {
+      return res.status(400).json({
+        status: "fail",
+        message: "No current user found in current user model",
+      });
+    }
+    // console.log("currentUser: ", currentUser);
+    // console.log("ADDED current user to req.user");
+    const user = await User.findById(currentUser.curr_user);
+    // console.log("USER: ", user);
+    req.user = user;
+    next();
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
     });
   }
 };

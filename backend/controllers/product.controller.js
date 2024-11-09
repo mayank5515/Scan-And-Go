@@ -1,6 +1,8 @@
 //NOTE: YHA PE DATA ESP32 se aaega and hum usko uske respective bill m dalenge
-const Product = require("../models/Product.models");
-const Bill = require("../models/Bill.models");
+const Product = require("../models/Product.model");
+const CurrUser = require("../models/CurrUser.model");
+const User = require("../models/User.model");
+const Bill = require("../models/Bill.model");
 const State = require("../models/State.model");
 const mongoose = require("mongoose");
 
@@ -104,10 +106,9 @@ exports.getAllProducts = async (req, res) => {
 
 //ADD NEW PRODUCT
 exports.addProduct = async (req, res, io) => {
-  // console.log("ENTERED IN ADD PRODUCT");
   try {
     // console.log("IO FROM ADD PRODUCT", io); // Check if io is defined
-    //ALERT: product aaega kha se ? req.body ? ya koi aur jagah se ?
+    // console.log("FROM REQ USER: ", req.user);
     const { unique_id, product_name, cost_price } = req.body;
     if (
       !req.body ||
@@ -122,91 +123,29 @@ exports.addProduct = async (req, res, io) => {
       });
     }
 
-    // console.log("from add product, req.user ->  ", req.user);
     //IF USER HAVE ACTIVE BILL PROP OR NOT -> I DONT NEED TO CHECK IF REQ.USER IS NULL OR NOT as protect middleware is working
     if (req.user.activeBill === null) {
       return res.status(400).json({
         status: "fail",
-        message: "Please create a bill",
+        message:
+          "User doenst have any active bill , Please create a bill first !!",
       });
     }
-    //HERE  create if and else , and depending on that call different mongoose functions
 
     const existingState = await State.findOne({ name: "removeActive" });
     if (!existingState) {
       await State.create({ name: "removeActive", value: false });
     }
-    console.log("Remove is ", existingState.value);
+    console.log(`Remove is ${existingState.value ? "active" : "inactive"}`);
+
+    //REMOVE PRODUCT
+
     if (existingState && existingState.value === true) {
-      //GET CURRENT BILL
-      const currBill = await Bill.findById(req.user.activeBill);
-      //state is true , remove the product
-      let deletedProduct = await Product.findOne({
-        bill_id: req.user.activeBill,
-        unique_id: unique_id,
-      });
-      console.log("deleted Product: ", deletedProduct);
-
-      //also delete from bills product array
-      if (
-        deletedProduct !== null &&
-        deletedProduct !== undefined &&
-        currBill.products.length !== 0
-      ) {
-        console.log("REMOVE THE PRODUCT FROM PRODUCTS ARRAY TOO , ", currBill);
-        currBill.products = currBill.products.filter(
-          (product) => product.toString() !== deletedProduct._id.toString()
-        );
-        console.log("CURR BILL AFTER DELETION : ", currBill);
-      }
-      if (deletedProduct !== null && deletedProduct !== undefined) {
-        //WHAT IF HACKER , REMOVED FROM PRODUCTS ARRAY BUT NOT FROM PRODUCT COLLECTION
-        //DELETE THE PRODUCT
-        deletedProduct = await Product.findByIdAndDelete(deletedProduct._id);
-      }
-
-      //UPDATE TOTAL AMOUNT OF BILL -> IRRESPECTIVE OF IF ANYTHING WAS DELETED OR NOT
-      let newTotalAmount = await getTotalAmount(currBill);
-      // console.log("newTotalAmount: ", newTotalAmount);
-      currBill.total_amount = newTotalAmount;
-      await currBill.save();
-
-      res.status(200).json({
-        status: "success",
-        message: "Product deleted successfully",
-        data: deletedProduct,
-        bill: currBill,
-      });
+      removeProduct(req, res);
     } else {
-      //1) CREATE NEW PRODUCT DOC
-      const newProduct = await Product.create({
-        bill_id: req.user.activeBill,
-        unique_id,
-        product_name,
-        cost_price,
-      });
-      //2) GET ACTIVE BILL -> TO EMBED(REF) PRODUCT IN IT
-      const currBill = await Bill.findById(req.user.activeBill);
-      //3) GET TOTAL COST OF PRODUCTS FOR THE CURRENT BILL
-      //IMP: AGGREGATE IS USED TO CALCULATE SUM OF ALL PRODUCTS COST PRICE
-      let totalAmount = await getTotalAmount(currBill);
-      console.log("TOTAL AMOUNT: ", totalAmount);
-      // console.log("newProduct: ", newProduct);
-      // console.log("currBill before : ", currBill);
-      const actualTotal = totalAmount + newProduct.cost_price;
-
-      //4) SAVING PRODUCT ID and UPDATED TOTAL IN BILL
-      currBill.products.push(newProduct._id);
-      currBill.total_amount = actualTotal;
-      await currBill.save();
-      console.log("currBill: ", currBill);
-
-      res.status(201).json({
-        status: "success",
-        message: "Product added successfully",
-        data: newProduct,
-      });
+      addProduct(req, res);
     }
+
     // 5) Emit the event to notify clients that a product was added
     if (io) {
       // Check if io is defined before calling emit
@@ -271,3 +210,201 @@ const getTotalAmount = async (currBill) => {
   }
   return totalAmount;
 };
+
+//-------------------------------------------------------------------------------------------------------------------//
+// REMOVE PRODUCT
+const removeProduct = async (req, res) => {
+  //GET CURRENT BILL
+  const currBill = await Bill.findById(req.user.activeBill);
+  //state is true , remove the product
+  let deletedProduct = await Product.findOne({
+    bill_id: req.user.activeBill,
+    unique_id: req.body.unique_id,
+  });
+  console.log("deleted Product: ", deletedProduct);
+
+  //also delete product from bills product array too
+  if (
+    deletedProduct !== null &&
+    deletedProduct !== undefined &&
+    currBill.products.length !== 0
+  ) {
+    currBill.products = currBill.products.filter(
+      (product) => product.toString() !== deletedProduct._id.toString()
+    );
+  }
+
+  if (deletedProduct !== null && deletedProduct !== undefined) {
+    //WHAT IF HACKER , REMOVED FROM PRODUCTS ARRAY BUT NOT FROM PRODUCT COLLECTION
+    //DELETE THE PRODUCT
+    deletedProduct = await Product.findByIdAndDelete(deletedProduct._id);
+  }
+
+  //UPDATE TOTAL AMOUNT OF BILL
+  let newTotalAmount = await getTotalAmount(currBill);
+  // console.log("newTotalAmount: ", newTotalAmount);
+  currBill.total_amount = newTotalAmount;
+  await currBill.save();
+
+  res.status(200).json({
+    status: "success",
+    message: "Product deleted successfully",
+    data: deletedProduct,
+  });
+};
+
+//-------------------------------------------------------------------------------------------------------------------//
+// ADD PRODUCT
+const addProduct = async (req, res) => {
+  //ADDING PRODUCT
+  //1) CREATE NEW PRODUCT DOC
+  const newProduct = await Product.create({
+    bill_id: req.user.activeBill,
+    unique_id: req.body.unique_id,
+    product_name: req.body.product_name,
+    cost_price: req.body.cost_price,
+  });
+  //2) GET ACTIVE BILL -> TO EMBED(REF) PRODUCT IN IT
+  const currBill = await Bill.findById(req.user.activeBill);
+  //3) GET TOTAL COST OF PRODUCTS FOR THE CURRENT BILL
+  //IMP: AGGREGATE IS USED TO CALCULATE SUM OF ALL PRODUCTS COST PRICE
+  let totalAmount = await getTotalAmount(currBill);
+  const actualTotal = totalAmount + newProduct.cost_price;
+
+  //4) SAVING PRODUCT ID and UPDATED TOTAL IN BILL
+  currBill.products.push(newProduct._id);
+  currBill.total_amount = actualTotal;
+  await currBill.save();
+
+  console.log("currBill: ", currBill);
+
+  res.status(201).json({
+    status: "success",
+    message: "Product added successfully",
+    data: newProduct,
+  });
+};
+
+//-------------------------------------------------------------------------------------------------------------------//
+//ADD NEW PRODUCT
+// exports.addProduct = async (req, res, io) => {
+//   // console.log(req.user, req.headers, req.cookie);
+//   // console.log("ENTERED IN ADD PRODUCT");
+//   try {
+//     // console.log("IO FROM ADD PRODUCT", io); // Check if io is defined
+//     //ALERT: product aaega kha se ? req.body ? ya koi aur jagah se ?
+//     const { unique_id, product_name, cost_price } = req.body;
+//     if (
+//       !req.body ||
+//       !req.body.unique_id ||
+//       !req.body.product_name ||
+//       !req.body.cost_price
+//     ) {
+//       return res.status(400).json({
+//         status: "fail",
+//         message:
+//           "Product is required , please mention all the details (unique_id, product_name, cost_price)",
+//       });
+//     }
+
+//     // console.log("from add product, req.user ->  ", req.user);
+//     //IF USER HAVE ACTIVE BILL PROP OR NOT -> I DONT NEED TO CHECK IF REQ.USER IS NULL OR NOT as protect middleware is working
+//     // if (req.user === null) {
+//     console.log("USER OBJECT: ", req.user);
+//     // return res.status(400).json({
+//     //   status: "fail",
+//     //   message: "Please create a bill",
+//     // });
+//     // }
+//     //HERE  create if and else , and depending on that call different mongoose functions
+
+//     const existingState = await State.findOne({ name: "removeActive" });
+//     if (!existingState) {
+//       await State.create({ name: "removeActive", value: false });
+//     }
+//     console.log("Remove is ", existingState.value);
+//     if (existingState && existingState.value === true) {
+//       //GET CURRENT BILL
+//       const currBill = await Bill.findById(req.user.activeBill);
+//       //state is true , remove the product
+//       let deletedProduct = await Product.findOne({
+//         bill_id: req.user.activeBill,
+//         unique_id: unique_id,
+//       });
+//       console.log("deleted Product: ", deletedProduct);
+
+//       //also delete from bills product array
+//       if (
+//         deletedProduct !== null &&
+//         deletedProduct !== undefined &&
+//         currBill.products.length !== 0
+//       ) {
+//         console.log("REMOVE THE PRODUCT FROM PRODUCTS ARRAY TOO , ", currBill);
+//         currBill.products = currBill.products.filter(
+//           (product) => product.toString() !== deletedProduct._id.toString()
+//         );
+//         console.log("CURR BILL AFTER DELETION : ", currBill);
+//       }
+//       if (deletedProduct !== null && deletedProduct !== undefined) {
+//         //WHAT IF HACKER , REMOVED FROM PRODUCTS ARRAY BUT NOT FROM PRODUCT COLLECTION
+//         //DELETE THE PRODUCT
+//         deletedProduct = await Product.findByIdAndDelete(deletedProduct._id);
+//       }
+
+//       //UPDATE TOTAL AMOUNT OF BILL -> IRRESPECTIVE OF IF ANYTHING WAS DELETED OR NOT
+//       let newTotalAmount = await getTotalAmount(currBill);
+//       // console.log("newTotalAmount: ", newTotalAmount);
+//       currBill.total_amount = newTotalAmount;
+//       await currBill.save();
+
+//       res.status(200).json({
+//         status: "success",
+//         message: "Product deleted successfully",
+//         data: deletedProduct,
+//         bill: currBill,
+//       });
+//     } else {
+//       //1) CREATE NEW PRODUCT DOC
+//       const newProduct = await Product.create({
+//         bill_id: req.user.activeBill,
+//         unique_id,
+//         product_name,
+//         cost_price,
+//       });
+//       //2) GET ACTIVE BILL -> TO EMBED(REF) PRODUCT IN IT
+//       const currBill = await Bill.findById(req.user.activeBill);
+//       //3) GET TOTAL COST OF PRODUCTS FOR THE CURRENT BILL
+//       //IMP: AGGREGATE IS USED TO CALCULATE SUM OF ALL PRODUCTS COST PRICE
+//       let totalAmount = await getTotalAmount(currBill);
+//       console.log("TOTAL AMOUNT: ", totalAmount);
+//       // console.log("newProduct: ", newProduct);
+//       // console.log("currBill before : ", currBill);
+//       const actualTotal = totalAmount + newProduct.cost_price;
+
+//       //4) SAVING PRODUCT ID and UPDATED TOTAL IN BILL
+//       currBill.products.push(newProduct._id);
+//       currBill.total_amount = actualTotal;
+//       await currBill.save();
+//       console.log("currBill: ", currBill);
+
+//       res.status(201).json({
+//         status: "success",
+//         message: "Product added successfully",
+//         data: [],
+//         // data: newProduct,
+//       });
+//     }
+//     // 5) Emit the event to notify clients that a product was added
+//     if (io) {
+//       // Check if io is defined before calling emit
+//       io.emit("productAdded"); // Emit the event to all connected clients
+//     } else {
+//       console.error("Socket.io instance is undefined.");
+//     }
+//   } catch (err) {
+//     res.status(400).json({
+//       status: "fail",
+//       message: err.message,
+//     });
+//   }
+// };

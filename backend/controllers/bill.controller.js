@@ -1,4 +1,4 @@
-const Bill = require("../models/Bill.models");
+const Bill = require("../models/Bill.model");
 
 //FUNCTION
 // Function to remove duplicates and add quantity
