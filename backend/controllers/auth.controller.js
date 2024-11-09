@@ -187,6 +187,42 @@ exports.protect = async (req, res, next) => {
   }
 };
 
+exports.logout = async (req, res) => {
+  try {
+    if (req.user.activeBill === null) {
+      return res.status(400).json({
+        status: "fail",
+        message: "No active bill found , Please create a bill first",
+      });
+    }
+    const currentBill = await Bill.findById(req.user.activeBill);
+
+    // CONVERT ACTIVE BILL TO NULL AND PUSH IT TO BILLS ARRAY
+    req.user.activeBill = null;
+    req.user.bills.push(currentBill._id);
+    await req.user.save();
+    console.log("USER FROM LOGOUT: ", req.user);
+    //
+    res.clearCookie("jwt", {
+      httpOnly: true, // Keep this consistent with how you originally set the JWT cookie
+      // sameSite: "Strict", // Or "Lax", depending on your requirements
+      // secure: process.env.NODE_ENV === "production", // Set to true in production
+    });
+    //
+    res.status(200).json({
+      status: "success",
+      message: "Logged out successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "fail",
+      message: "Something went wrong!",
+      error: err,
+    });
+  }
+};
+
+///////////////////////////////////////////---------------------------------------------->
 // console.log("cdate: ", cDate);
 // console.log("cDate in milliseconds", cDate.getTime());
 // console.log("15 mins ahead in mill", cDate.getTime() + 15 * 60 * 1000);

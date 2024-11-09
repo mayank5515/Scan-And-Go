@@ -13,4 +13,6 @@ router
   .route("/createbill")
   .post(authController.protect, billController.createActiveBill);
 
+router.route("/checkout").get(authController.protect, billController.checkout);
+
 module.exports = router;

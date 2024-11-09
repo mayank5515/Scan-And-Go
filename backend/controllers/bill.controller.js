@@ -1,5 +1,45 @@
 const Bill = require("../models/Bill.models");
 
+//FUNCTION
+// Function to remove duplicates and add quantity
+const processProducts = (products) => {
+  // Use a Map to group products by their unique_id
+  const productMap = new Map();
+
+  products.forEach((product) => {
+    const {
+      unique_id,
+      cost_price,
+      product_name,
+      bill_id,
+      createdAt,
+      updatedAt,
+    } = product;
+
+    // If the product is already in the Map, increment the quantity
+    if (productMap.has(unique_id)) {
+      const existingProduct = productMap.get(unique_id);
+      existingProduct.quantity += 1;
+    } else {
+      // If the product is not in the Map, add it with quantity set to 1
+      productMap.set(unique_id, {
+        _id: product._id,
+        bill_id,
+        product_name,
+        unique_id,
+        cost_price,
+        createdAt,
+        updatedAt,
+        __v: product.__v,
+        quantity: 1,
+      });
+    }
+  });
+
+  // Convert the Map values back to an array
+  return Array.from(productMap.values());
+};
+
 //CREATE NEW BILL
 //this will be called initially only
 exports.createActiveBill = async (req, res) => {
@@ -22,6 +62,9 @@ exports.createActiveBill = async (req, res) => {
       console.log(
         "USER ALREADY HAVE AN ACTIVE BILL , PLEASE REMOVE THAT FIRST"
       );
+    }
+    if (req.user.activeBill === null) {
+      console.log("FIRST TIME CREATING BILL");
     }
     res.status(200).json({
       status: "success",
@@ -72,6 +115,51 @@ exports.getActiveBill = async (req, res) => {
       status: "fail",
       message: err.message,
       error: err,
+    });
+  }
+};
+
+exports.checkout = async (req, res) => {
+  try {
+    if (req.user.activeBill === null) {
+      return res.status(400).json({
+        status: "fail",
+        message: "No active bill found , Please create a bill first",
+      });
+    }
+    const currentBill = await Bill.findById(req.user.activeBill).populate(
+      "products"
+    );
+    let modifiedBill = currentBill;
+    if (currentBill.products.length !== 0) {
+      // Process the products array
+      const uniqueProducts = processProducts(currentBill.products);
+
+      // You may also want to update the total amount based on unique products
+      const updatedTotalAmount = uniqueProducts.reduce(
+        (sum, product) => sum + product.cost_price * product.quantity,
+        0
+      );
+
+      // Log or return the modified bill
+      modifiedBill = {
+        ...currentBill._doc, // spread existing properties of the bill document
+        products: uniqueProducts,
+        total_amount: updatedTotalAmount,
+      };
+    }
+
+    console.log("MODIFIED BILL: ", modifiedBill);
+
+    res.status(200).json({
+      status: "success",
+      message: "Bill fetched successfully",
+      data: modifiedBill,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
     });
   }
 };
