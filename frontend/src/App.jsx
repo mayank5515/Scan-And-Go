@@ -29,7 +29,7 @@ function App() {
   //   }, []);
   return (
     <>
-      <div className=" p-1 w-full h-full bg-gray-100">
+      <div className=" p-1 w-full h-[100vh] bg-gray-100">
         <Routes>
           <Route path="/" element={<LoginAndSignupPage />} />
           <Route
@@ -37,7 +37,7 @@ function App() {
             element={<PrivateRoute component={ShoppingListPage} />}
           />
           {/* <Route path="/cart" element={<ShoppingListPage />} /> */}
-          <Route path="/bill" element={<BillPage />} />
+          <Route path="/bill" element={<PrivateRoute element={BillPage} />} />
         </Routes>
       </div>
       <Toaster />

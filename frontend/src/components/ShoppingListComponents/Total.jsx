@@ -2,23 +2,23 @@ import TotalList from "../TotalComponents/TotalList";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../../utils/axiosInstance";
+import generatePDF from "../../utils/generatePdf";
 export default function Total({ totalBill, products }) {
   const navigate = useNavigate();
-  // const URL = `http://192.168.179.131:3000`;
-  // const URL = `http://localhost:3000`;
-  const deleteAllProducts = async () => {
+
+  const handleCheckout = async () => {
     try {
-      const response = axios.delete("/products/checkout");
-      console.log("DELETE RESPONSE: ", response);
-      console.log("DELETE RESPONSE DATA: ", response.data);
+      const response = await axios.get("/bills/checkout");
+      console.log("RESPONSE FROM CHECKOUT", response.data, response);
+      generatePDF({ jsonData: response.data });
     } catch (err) {
-      console.log(err);
+      console.error("Error checking out", err);
     }
   };
 
   const handleNavigate = () => {
-    deleteAllProducts();
-    navigate("/bill");
+    handleCheckout();
+    // navigate("/bill");
   };
 
   return (

@@ -20,7 +20,9 @@ export default function Login_And_SignupBlock({
         />
         <button
           onClick={requestFuncion}
-          className={`border-2 w-[50%] rounded-md py-2 px-1 bg-${buttonColor}-600 text-white font-[16px]`}
+          className={`border-2 w-[50%] rounded-md py-2 px-1 ${
+            buttonColor === "red" ? "bg-red-600" : "bg-green-600"
+          } text-white font-[16px]`}
         >
           {buttonText}
         </button>
