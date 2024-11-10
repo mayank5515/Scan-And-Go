@@ -36,12 +36,6 @@ export default function ShoppingListPage() {
           return toast.error("Please add items to your cart 🛒");
         }
         console.log("FETCH ALL PRODUCTS RESPONSE: ", response);
-        // console.log(
-        //   "DATA FROM FETCH ALL PRODUCTS: ",
-        //   data,
-        //   " PRODUCTS: ",
-        //   data[0].products
-        // );
         setProducts(data[0].products);
         setTotalBill(total);
       } catch (err) {

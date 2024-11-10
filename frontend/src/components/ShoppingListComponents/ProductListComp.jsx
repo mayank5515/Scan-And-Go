@@ -32,14 +32,14 @@ export default function ProductListComp({ products }) {
 
   return (
     <section className="lg:h-[90vh] h-full flex flex-col justify-between ">
-      <div className="border-2 border-gray-500 space-y-1 bg-stone-200 lg:w-[65vw]  p-2 overflow-y-scroll h-[55vh] lg:h-[75vh] ">
+      <div className="border-2 border-gray-500 space-y-1  bg-stone-200 lg:w-[65vw]  p-2 overflow-y-auto h-[55vh] lg:h-[75vh] ">
         {products.length > 0 ? (
           products.map((el, ind) => {
             return <ProductItem key={ind} id={el.id} product={el} />;
           })
         ) : (
-          <p className="text-black text-[16px] text-center h-[73vh] flex justify-center items-center">
-            Please Add items in your cart
+          <p className="text-gray-700 text-lg font-medium  text-center h-[70vh] flex justify-center items-center bg-white border border-green-600 rounded-md shadow-md p-4">
+            Your cart is currently empty. Start adding items to shop!
           </p>
         )}
       </div>

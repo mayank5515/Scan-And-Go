@@ -37,7 +37,7 @@ function App() {
             element={<PrivateRoute component={ShoppingListPage} />}
           />
           {/* <Route path="/cart" element={<ShoppingListPage />} /> */}
-          <Route path="/bill" element={<PrivateRoute element={BillPage} />} />
+          <Route path="/bill" element={<BillPage />} />
         </Routes>
       </div>
       <Toaster />

@@ -2,8 +2,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 const generatePDF = ({ jsonData }) => {
   const doc = new jsPDF();
-  console.log("jsonData: ", jsonData);
-
+  // console.log("JSON DATA FROM PDF: ", jsonData);
   // Add Title
   doc.setFontSize(18);
   doc.text("Bill Summary", 14, 20);
