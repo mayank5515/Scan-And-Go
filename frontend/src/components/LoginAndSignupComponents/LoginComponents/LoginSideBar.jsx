@@ -25,7 +25,7 @@ export default function LoginSideBar({
 }) {
   const last4Digits = phoneNumber.slice(-4);
   return (
-    <div className="border-2 border-green-400 p-6  flex flex-col space-y-10  lg:w-[220%] md:w-[100%]">
+    <div className=" p-6  flex flex-col space-y-10  lg:w-[220%] md:w-[100%]">
       <p className="text-[38px] font-Barlow font-semibold text-black text-center ">
         Welcome to{" "}
         <span className="bg-yellow-400 p-1 border-[1px] overflow-hidden rounded-md ">
