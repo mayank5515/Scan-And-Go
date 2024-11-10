@@ -1,5 +1,4 @@
 import TotalList from "../TotalComponents/TotalList";
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../../utils/axiosInstance";
 import generatePDF from "../../utils/generatePdf";
@@ -10,7 +9,7 @@ export default function Total({ totalBill, products }) {
     try {
       const response = await axios.get("/bills/checkout");
       console.log("RESPONSE FROM CHECKOUT", response.data, response);
-      generatePDF({ jsonData: response.data });
+      generatePDF({ jsonData: response.data.data });
     } catch (err) {
       console.error("Error checking out", err);
     }
