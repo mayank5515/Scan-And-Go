@@ -146,10 +146,13 @@ exports.checkout = async (req, res) => {
         ...currentBill._doc, // spread existing properties of the bill document
         products: uniqueProducts,
         total_amount: updatedTotalAmount,
+        customer_phoneNumber: req.user.phone_number,
+        bill_date: new Date().toLocaleDateString(),
+        bill_time: new Date().toLocaleTimeString(),
       };
     }
 
-    console.log("MODIFIED BILL: ", modifiedBill);
+    console.log("MODIFIED BILL");
 
     res.status(200).json({
       status: "success",
