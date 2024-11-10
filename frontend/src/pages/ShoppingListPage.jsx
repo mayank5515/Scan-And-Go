@@ -36,12 +36,6 @@ export default function ShoppingListPage() {
           return toast.error("Please add items to your cart 🛒");
         }
         console.log("FETCH ALL PRODUCTS RESPONSE: ", response);
-        // console.log(
-        //   "DATA FROM FETCH ALL PRODUCTS: ",
-        //   data,
-        //   " PRODUCTS: ",
-        //   data[0].products
-        // );
         setProducts(data[0].products);
         setTotalBill(total);
       } catch (err) {
@@ -65,7 +59,7 @@ export default function ShoppingListPage() {
   }, []);
 
   return (
-    <>
+    <div className="bg-gray-100">
       <h1 className="text-black text-[30px] text-center ">Shopping List 🛒</h1>
       <div className="border-4 border-green-600 p-1 h-full flex flex-col lg:flex-row mt-1 ">
         {/* LIST OF ITEMS */}
@@ -73,6 +67,6 @@ export default function ShoppingListPage() {
         {/* TOTAL BILL */}
         <Total totalBill={totalBill} products={products} />
       </div>
-    </>
+    </div>
   );
 }

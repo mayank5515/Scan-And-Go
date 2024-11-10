@@ -60,11 +60,13 @@ export default function LoginAndSignupPage() {
     }
   };
   return (
-    <div className="border-2 border-black p-1 bg-gray-100  h-full w-full flex flex-col lg:flex-row justify-between">
+    <div className=" p-2 bg-[#EBE6E7]  h-screen w-full flex flex-col lg:flex-row justify-between overflow-hidden">
       <LoginSideBar step={step} phoneNumber={phoneNumber} />
-      <div className="border-2 border-blue-500 h-full w-full flex flex-col">
+      <div className="border-[1px] border-gray-400"></div>
+      <div className="ml-2 h-full w-full flex flex-col bg-gray-100  border-2 border-black rounded-lg">
         <Login_InputBlockTitle step={step} />
-        <section className=" mt-2 border-2 border-black h-full">
+        <hr className="border-[1px] border-gray-400 px-4" />
+        <section className=" mt-2  h-full">
           {step === 1 ? (
             <Login_And_SignupBlock
               dynamicValue={phoneNumber}

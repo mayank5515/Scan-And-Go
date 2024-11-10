@@ -29,7 +29,7 @@ function App() {
   //   }, []);
   return (
     <>
-      <div className=" p-1 w-full h-full bg-gray-100">
+      <div className=" p-1 w-full h-[95vh] bg-gray-100">
         <Routes>
           <Route path="/" element={<LoginAndSignupPage />} />
           <Route

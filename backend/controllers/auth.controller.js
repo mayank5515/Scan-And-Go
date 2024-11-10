@@ -1,4 +1,5 @@
 const User = require("../models/User.model");
+const Bill = require("../models/Bill.model");
 const CurrUser = require("../models/CurrUser.model");
 const dotenv = require("dotenv");
 const otpGenerator = require("otp-generator");
@@ -208,16 +209,15 @@ exports.logout = async (req, res) => {
       });
     }
     // remove currUser from CurrUser model
-    const currentUser = await CurrUser.findOne({ name: "currentUser" });
-    if (!currentUser) currentUser.curr_user = null;
-    await currentUser.save();
-    //
+    const currentUser = await CurrUser.deleteMany();
 
+    //GET ACTIVE BILL
+    // console.log("CURRENT USER", currentUser);
     const currentBill = await Bill.findById(req.user.activeBill);
-
     // CONVERT ACTIVE BILL TO NULL AND PUSH IT TO BILLS ARRAY
     req.user.activeBill = null;
     req.user.bills.push(currentBill._id);
+    // console.log("CURRENT BILL FROM LOGOUT ", currentBill);
     await req.user.save();
     console.log("USER FROM LOGOUT: ", req.user);
     //

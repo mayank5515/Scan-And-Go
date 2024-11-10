@@ -1,24 +1,42 @@
 import TotalList from "../TotalComponents/TotalList";
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../../utils/axiosInstance";
+import generatePDF from "../../utils/generatePdf";
+import toast from "react-hot-toast";
 export default function Total({ totalBill, products }) {
   const navigate = useNavigate();
-  // const URL = `http://192.168.179.131:3000`;
-  // const URL = `http://localhost:3000`;
-  const deleteAllProducts = async () => {
+  const handleCheckout = async () => {
+    let data;
     try {
-      const response = axios.delete("/products/checkout");
-      console.log("DELETE RESPONSE: ", response);
-      console.log("DELETE RESPONSE DATA: ", response.data);
+      const response = await axios.get("/bills/checkout");
+      // console.log("RESPONSE FROM CHECKOUT", response.data, response);
+      if (response.status === 200) {
+        data = response.data;
+      }
     } catch (err) {
-      console.log(err);
+      console.error("Error checking out", err);
     }
+    return data;
   };
 
-  const handleNavigate = () => {
-    deleteAllProducts();
-    navigate("/bill");
+  const handleNavigate = async () => {
+    //checkout , -> data fetching , pdf generation
+    //logout req , navigate
+    try {
+      const checkoutData = await handleCheckout();
+      const response = await axios.get("/auth/logout");
+      console.log("CHECKOUT DATA: ", checkoutData);
+      // console.log("ALSO: ", checkoutData.data);
+      console.log("RESPONSE FROM LOGOUT ", response);
+      if (response.status === 200) {
+        generatePDF({ jsonData: checkoutData.data });
+        toast.success("You have successfully logged out !!");
+        navigate("/bill", { state: { checkoutData } });
+      }
+    } catch (err) {
+      toast.error("Error logging out ");
+      console.error(`Error occured while checking out ${err}`);
+    }
   };
 
   return (
