@@ -152,7 +152,7 @@ exports.checkout = async (req, res) => {
       };
     }
 
-    console.log("MODIFIED BILL");
+    // console.log("FROM CHECKOUT CONTROLLER");
 
     res.status(200).json({
       status: "success",

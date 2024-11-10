@@ -22,6 +22,7 @@ const getProductsGroupedByBillAndQuantity = async (myBillId) => {
         },
         product_name: { $first: "$product_name" },
         cost_price: { $first: "$cost_price" },
+        product_description: { $first: "$product_description" },
         quantity: { $sum: 1 }, // Count duplicates
       },
     },
@@ -34,6 +35,7 @@ const getProductsGroupedByBillAndQuantity = async (myBillId) => {
             //as we dont care about individual products id , we are only displaying unique_id and other details
             unique_id: "$_id.unique_id",
             product_name: "$product_name",
+            product_description: "$product_description",
             cost_price: "$cost_price",
             quantity: "$quantity",
           },
@@ -109,11 +111,13 @@ exports.addProduct = async (req, res, io) => {
   try {
     // console.log("IO FROM ADD PRODUCT", io); // Check if io is defined
     // console.log("FROM REQ USER: ", req.user);
-    const { unique_id, product_name, cost_price } = req.body;
+    const { unique_id, product_name, cost_price, product_description } =
+      req.body;
     if (
       !req.body ||
       !req.body.unique_id ||
       !req.body.product_name ||
+      !req.body.product_description ||
       !req.body.cost_price
     ) {
       return res.status(400).json({
@@ -262,8 +266,10 @@ const addProduct = async (req, res) => {
     bill_id: req.user.activeBill,
     unique_id: req.body.unique_id,
     product_name: req.body.product_name,
+    product_description: req.body.product_description,
     cost_price: req.body.cost_price,
   });
+
   //2) GET ACTIVE BILL -> TO EMBED(REF) PRODUCT IN IT
   const currBill = await Bill.findById(req.user.activeBill);
   //3) GET TOTAL COST OF PRODUCTS FOR THE CURRENT BILL
