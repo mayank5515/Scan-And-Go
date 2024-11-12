@@ -7,7 +7,7 @@ export default function BillPage() {
   const location = useLocation();
   const checkoutData = location.state?.checkoutData;
   const { data } = checkoutData;
-  // console.log("CHECKOUT DATA FROM BILL: ", checkoutData);
+  console.log("CHECKOUT DATA FROM BILL: ", checkoutData);
   const handleDownloadBill = () => {
     generatePDF({ jsonData: checkoutData.data });
   };
@@ -61,7 +61,15 @@ export default function BillPage() {
               return (
                 <li className="flex justify-between" key={i}>
                   <span>{el.product_name}</span>
-                  <span>₹{el.cost_price}</span>
+                  <div className="flex items-center space-x-2 font-medium text-gray-600">
+                    <p className="text-sm">₹{el.cost_price || 0}</p>
+                    <span className="text-sm text-gray-400">x</span>
+                    <p className="text-sm">{el.quantity || 0}</p>
+                    <span className="text-sm text-gray-400">=</span>
+                    <p className="text-lg text-indigo-600 font-semibold">
+                      ₹{el.cost_price * el.quantity || 0}
+                    </p>
+                  </div>
                 </li>
               );
             })}

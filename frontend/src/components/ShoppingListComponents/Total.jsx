@@ -26,7 +26,6 @@ export default function Total({ totalBill, products }) {
       const checkoutData = await handleCheckout();
       const response = await axios.get("/auth/logout");
       console.log("CHECKOUT DATA: ", checkoutData);
-      // console.log("ALSO: ", checkoutData.data);
       console.log("RESPONSE FROM LOGOUT ", response);
       if (response.status === 200) {
         generatePDF({ jsonData: checkoutData.data });
