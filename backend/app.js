@@ -33,12 +33,16 @@ app.use(express.json());
 //   allowedHeaders: "Content-Type,Authorization",
 // };
 
-app.use(
-  cors({
-    origin: ["http://localhost:5173"], // replace with your frontend URL
-    credentials: true, // allow cookies to be sent
-  })
-);
+const corsOptions = {
+  origin: ["http://localhost:5173"], // replace with your frontend's URL
+  methods: "GET,POST,PUT,DELETE,PATCH",
+  credentials: true, // allow cookies to be sent
+  optionsSuccessStatus: 200,
+  allowedHeaders: "Content-Type,Authorization",
+};
+
+// Enable CORS for all routes and methods
+app.use(cors(corsOptions));
 
 app.use("/api/v1/products", productRouter);
 app.use("/api/v1/bills", billRouter);
