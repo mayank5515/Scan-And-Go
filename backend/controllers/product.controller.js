@@ -109,6 +109,7 @@ exports.getAllProducts = async (req, res) => {
 //ADD NEW PRODUCT
 exports.addProduct = async (req, res, io) => {
   try {
+    console.log("ENTERED IN ADD PRODUCT");
     // console.log("IO FROM ADD PRODUCT", io); // Check if io is defined
     // console.log("FROM REQ USER: ", req.user);
     const { unique_id, product_name, cost_price, product_description } =
@@ -123,7 +124,7 @@ exports.addProduct = async (req, res, io) => {
       return res.status(400).json({
         status: "fail",
         message:
-          "Product is required , please mention all the details (unique_id, product_name, cost_price)",
+          "Product is required , please mention all the details (unique_id, product_name, cost_price , product_description)",
       });
     }
 
@@ -282,7 +283,8 @@ const addProduct = async (req, res) => {
   currBill.total_amount = actualTotal;
   await currBill.save();
 
-  console.log("currBill: ", currBill);
+  // console.log("currBill: ", currBill);
+  console.log("PRODUCT ADDED: ", newProduct);
 
   res.status(201).json({
     status: "success",
