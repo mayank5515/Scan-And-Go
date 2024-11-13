@@ -219,7 +219,12 @@ exports.logout = async (req, res) => {
     req.user.bills.push(currentBill._id);
     // console.log("CURRENT BILL FROM LOGOUT ", currentBill);
     await req.user.save();
-    console.log("USER FROM LOGOUT: ", req.user);
+    console.log(
+      "ACTIVE BILL OF USER FROM LOGOUT: ",
+      req.user.activeBill,
+      " BILLS : ",
+      req.user.bills
+    );
     //
     res.clearCookie("jwt", {
       httpOnly: true, // Keep this consistent with how you originally set the JWT cookie

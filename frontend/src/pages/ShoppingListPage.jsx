@@ -7,6 +7,7 @@ import ProductListComp from "../components/ShoppingListComponents/ProductListCom
 import Total from "../components/ShoppingListComponents/Total.jsx";
 
 const URL = "http://localhost:3000";
+// const URL = "http://192.168.109.131:3000";
 const socket = io(URL);
 
 export default function ShoppingListPage() {

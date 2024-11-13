@@ -56,6 +56,7 @@ exports.createActiveBill = async (req, res) => {
       //UPDATE USER WITH ACTIVE BILL , if only user doesnot have any active bill
       req.user.activeBill = newBill._id;
       await req.user.save();
+      console.log("USER UPDATED WITH ACTIVE BILL: ", req.user.activeBill);
     }
 
     if (req.user.activeBill !== null) {
@@ -63,9 +64,7 @@ exports.createActiveBill = async (req, res) => {
         "USER ALREADY HAVE AN ACTIVE BILL , PLEASE REMOVE THAT FIRST"
       );
     }
-    if (req.user.activeBill === null) {
-      console.log("FIRST TIME CREATING BILL");
-    }
+
     res.status(200).json({
       status: "success",
       message: "Bill created successfully",

@@ -4,8 +4,14 @@ const generatePDF = ({ jsonData }) => {
   const doc = new jsPDF();
   // console.log("JSON DATA FROM PDF: ", jsonData);
   // Add Title
-  doc.setFontSize(18);
+  // Title Styling
+  doc.setFontSize(22);
+  doc.setTextColor(54, 162, 235); // Lighter blue color for the title
   doc.text("Bill Summary", 14, 20);
+
+  //   // Bill Information Section Styling
+  doc.setFontSize(12);
+  doc.setTextColor(60); // Dark gray for text
 
   // Add Bill Information
   doc.setFontSize(12);
@@ -26,19 +32,32 @@ const generatePDF = ({ jsonData }) => {
       product.quantity || 1, // Use quantity if available
     ]);
 
-    // Add a table with autoTable
+    // Custom Table Styling
     doc.autoTable({
       head: [["#", "Product Name", "Unique ID", "Cost Price", "Quantity"]],
       body: tableData,
-      startY: 60, // Adjust start Y position to leave space for bill details
+      startY: 60,
+      headStyles: { fillColor: [54, 162, 235] }, // Lighter blue header
+      alternateRowStyles: { fillColor: [245, 251, 255] }, // Very light gray rows
+      margin: { left: 14, right: 14 },
+      styles: {
+        fontSize: 10,
+        cellPadding: 3,
+        textColor: 30,
+        lineColor: [220, 220, 220],
+        lineWidth: 0.1,
+      },
     });
 
-    // Add the total amount
+    //     // Total amount styling
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
     doc.text(
       `Total Bill: Rs ${jsonData.total_amount}`,
       14,
-      doc.lastAutoTable.finalY + 10 // Positioning the total amount after the table
+      doc.lastAutoTable.finalY + 15
     );
+    doc.setFont("helvetica", "normal");
   }
 
   // Save the PDF locally
