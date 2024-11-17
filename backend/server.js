@@ -1,9 +1,8 @@
 const socketIo = require("socket.io");
 const connectDB = require("./middlewares/dbconn");
 const mongoose = require("mongoose");
-const Razorpay = require("razorpay");
 const { initSocket } = require("./utils/socket"); // Import the init function
-const { initRazorpay } = require("./utils/razorpayInstance");
+
 const app = require("./app");
 
 // var WebSocketServer = require("websocket").server;
@@ -14,12 +13,6 @@ connectDB();
 const server = require("http").createServer(app);
 
 initSocket(server);
-//Instantiate razorpay instance
-const instace = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
-// console.log("Razorpay instance", instace);
 
 const PORT = process.env.PORT || 3000;
 mongoose.connection.once("open", () => {
@@ -35,5 +28,3 @@ process.on("uncaughtException", (err) => {
   }
   console.error(err, err.name, err.message);
 });
-
-module.exports = instace;

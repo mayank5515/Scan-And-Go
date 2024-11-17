@@ -18,7 +18,7 @@ const twilioClient = require("twilio")(accountSID, authToken);
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: "3h",
+    expiresIn: 25 * 60 * 1000, //25 mins
   });
 };
 

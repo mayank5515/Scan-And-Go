@@ -119,6 +119,7 @@ exports.getActiveBill = async (req, res) => {
 };
 
 exports.checkout = async (req, res) => {
+  console.log("CHECKOUT CONTROLLER");
   try {
     if (req.user.activeBill === null) {
       return res.status(400).json({
@@ -151,7 +152,7 @@ exports.checkout = async (req, res) => {
       };
     }
 
-    // console.log("FROM CHECKOUT CONTROLLER");
+    console.log("FROM CHECKOUT CONTROLLER", modifiedBill);
 
     res.status(200).json({
       status: "success",

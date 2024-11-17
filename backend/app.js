@@ -12,6 +12,7 @@ const billRouter = require("./routes/bill.route");
 const paymentRouter = require("./routes/payment.route");
 
 //DOTENV
+
 dotenv.config({ path: "./config.env" });
 
 const app = express();

@@ -18,7 +18,7 @@ export default function ShoppingListPage() {
     const createBill = async () => {
       try {
         const response = await axios.post("/bills/createbill");
-        console.log("CREATE BILL RESPONSE: ", response, response.data);
+        // console.log("CREATE BILL RESPONSE: ", response, response.data);
       } catch (err) {
         console.log(err);
       }
@@ -36,7 +36,7 @@ export default function ShoppingListPage() {
           setProducts([]);
           return toast.error("Please add items to your cart 🛒");
         }
-        console.log("FETCH ALL PRODUCTS RESPONSE: ", response);
+        // console.log("FETCH ALL PRODUCTS RESPONSE: ", response);
         setProducts(data[0].products);
         setTotalBill(total);
       } catch (err) {

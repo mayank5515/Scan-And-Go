@@ -1,12 +1,14 @@
 import React from "react";
 
 export default function Login_And_SignupBlock({
+  step = 1,
   requestFuncion,
   placeholderText = "Enter your details",
   buttonText = "Submit",
   onChangeFunction,
   dynamicValue,
   buttonColor = "green",
+  resendOtpFunction,
 }) {
   return (
     <div className="flex justify-center items-center h-full py-4">
@@ -28,6 +30,14 @@ export default function Login_And_SignupBlock({
         >
           {buttonText}
         </button>
+        {step === 2 && (
+          <p
+            className="text-black text-[16px] underline underline-offset-2 mt-2 cursor-pointer"
+            onClick={() => resendOtpFunction()}
+          >
+            Didnt recieve OTP ? Resend OTP.
+          </p>
+        )}
       </div>
     </div>
   );
