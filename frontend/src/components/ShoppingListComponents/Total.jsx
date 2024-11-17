@@ -11,12 +11,12 @@ export default function Total({ totalBill, products }) {
   const handleNavigate = async () => {
     try {
       const checkoutData = await handleCheckout();
-      console.log("CHECKOUT DATA: ", checkoutData);
+      // console.log("CHECKOUT DATA: ", checkoutData);
       const paymentResStatus = await paymentHandler({
         phone_number: checkoutData.data.customer_phoneNumber,
         amount: checkoutData.data.total_amount,
       });
-      console.log("paymentResStatus: ", paymentResStatus);
+      // console.log("paymentResStatus: ", paymentResStatus);
       //IF PAYMENT SUCCESSFULL , LOGOUT USER AND GENERATE PDF
       if (paymentResStatus) {
         const logoutRes = await axios.get("/auth/logout");
