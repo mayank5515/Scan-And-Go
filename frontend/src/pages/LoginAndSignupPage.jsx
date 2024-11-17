@@ -69,6 +69,7 @@ export default function LoginAndSignupPage() {
         <section className=" mt-2  h-full">
           {step === 1 ? (
             <Login_And_SignupBlock
+              step={step}
               dynamicValue={phoneNumber}
               requestFuncion={requestOtp}
               onChangeFunction={setPhoneNumber}
@@ -78,12 +79,14 @@ export default function LoginAndSignupPage() {
             />
           ) : (
             <Login_And_SignupBlock
+              step={step}
               dynamicValue={otp}
               requestFuncion={verifyOtp}
               onChangeFunction={setOtp}
               placeholderText="Enter OTP here"
               buttonText="Verify OTP"
               buttonColor="green"
+              resendOtpFunction={requestOtp}
             />
           )}
         </section>

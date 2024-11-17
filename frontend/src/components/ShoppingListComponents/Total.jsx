@@ -3,34 +3,32 @@ import { useNavigate } from "react-router-dom";
 import axios from "../../utils/axiosInstance";
 import generatePDF from "../../utils/generatePdf";
 import toast from "react-hot-toast";
+import paymentHandler from "../../utils/paymentHandler";
+import handleCheckout from "../../utils/checkoutHandler";
 export default function Total({ totalBill, products }) {
   const navigate = useNavigate();
-  const handleCheckout = async () => {
-    let data;
-    try {
-      const response = await axios.get("/bills/checkout");
-      // console.log("RESPONSE FROM CHECKOUT", response.data, response);
-      if (response.status === 200) {
-        data = response.data;
-      }
-    } catch (err) {
-      console.error("Error checking out", err);
-    }
-    return data;
-  };
 
   const handleNavigate = async () => {
-    //checkout , -> data fetching , pdf generation
-    //logout req , navigate
     try {
       const checkoutData = await handleCheckout();
-      const response = await axios.get("/auth/logout");
       console.log("CHECKOUT DATA: ", checkoutData);
-      console.log("RESPONSE FROM LOGOUT ", response);
-      if (response.status === 200) {
+      const paymentResStatus = await paymentHandler({
+        phone_number: checkoutData.data.customer_phoneNumber,
+        amount: checkoutData.data.total_amount,
+      });
+      console.log("paymentResStatus: ", paymentResStatus);
+      //IF PAYMENT SUCCESSFULL , LOGOUT USER AND GENERATE PDF
+      if (paymentResStatus) {
+        const logoutRes = await axios.get("/auth/logout");
+        if (logoutRes.status === 200) {
+          toast.success("You have successfully logged out !!");
+        } else {
+          toast.error("Error logging out ");
+        }
         generatePDF({ jsonData: checkoutData.data });
-        toast.success("You have successfully logged out !!");
-        navigate("/bill", { state: { checkoutData } });
+        // IF PAYMENT SUCCESSFULL AND LOGOUT SUCCESSFULL , NAVIGATE TO BILL PAGE
+        if (paymentResStatus && logoutRes.status === 200)
+          navigate("/bill", { state: { checkoutData } });
       }
     } catch (err) {
       toast.error("Error logging out ");
