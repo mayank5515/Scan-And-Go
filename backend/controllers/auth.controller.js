@@ -7,14 +7,15 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const otpValidateTime = require("../utils/otpValidateTime");
 const { promisify } = require("util");
+const twilio = require("twilio");
 
-// const accountSID = process.env.TWILIO_ACCOUNT_SID;
-// const authToken = process.env.TWILIO_AUTH_TOKEN;
-// console.log(accountSID, authToken, process.env);
-const accountSID = "ACb4041dca060440a4a7e08f3bf1c200bd";
-const authToken = "0a93084d1b14a858fcf5cc75204043d4";
-const twilioPhoneNumber = "+12037796781";
-const twilioClient = require("twilio")(accountSID, authToken);
+dotenv.config({ path: "./config.env" });
+
+const accountSID = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
+// console.log("THREE THINGS: ", accountSID, authToken, twilioPhoneNumber);
+const twilioClient = twilio(accountSID, authToken);
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -66,14 +67,14 @@ exports.sendOtp = async (req, res) => {
       }
     );
 
-    console.log("OTP is : ", otp);
+    console.log("OTP is : ", otp, " : ", twilioClient);
     //SEND OTP TO CLIENT USING TWILIO
-    await twilioClient.messages.create({
+    const twilioRes = await twilioClient.messages.create({
       body: `Your OTP is :${otp} , your OTP is valid for 5 mins`,
       to: phone_number,
       from: twilioPhoneNumber,
     });
-
+    console.log("TWILIO RESPONSE: ", twilioRes);
     res.status(200).json({
       status: "success",
       message: `OTP sent successfully to ${phone_number} , Your OTP is valid for 5 mins !`,

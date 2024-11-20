@@ -85,7 +85,7 @@ exports.getAllProducts = async (req, res) => {
     //-----getProductsGroupedByBillAndQuantity-----//
     const resultAgg = await getProductsGroupedByBillAndQuantity(currBill._id);
 
-    console.log("result from getAllProducts: ", resultAgg);
+    // console.log("result from getAllProducts: ", resultAgg);
     //NOTE: CREATE CHECK CONDITION IF AGGREGRATE RETURNS EMPTY ARRAY , THEN SEND EMPTY ARRAY
     //4) GET TOTAL COST OF PRODUCTS FOR THE CURRENT BILL
 
@@ -109,7 +109,6 @@ exports.getAllProducts = async (req, res) => {
 //ADD NEW PRODUCT
 exports.addProduct = async (req, res, io) => {
   try {
-    console.log("ENTERED IN ADD PRODUCT");
     // console.log("IO FROM ADD PRODUCT", io); // Check if io is defined
     // console.log("FROM REQ USER: ", req.user);
     const { unique_id, product_name, cost_price, product_description } =
@@ -226,7 +225,7 @@ const removeProduct = async (req, res) => {
     bill_id: req.user.activeBill,
     unique_id: req.body.unique_id,
   });
-  console.log("deleted Product: ", deletedProduct);
+  // console.log("deleted Product: ", deletedProduct);
 
   //also delete product from bills product array too
   if (
@@ -284,7 +283,7 @@ const addProduct = async (req, res) => {
   await currBill.save();
 
   // console.log("currBill: ", currBill);
-  console.log("PRODUCT ADDED: ", newProduct);
+  // console.log("PRODUCT ADDED: ", newProduct);
 
   res.status(201).json({
     status: "success",
