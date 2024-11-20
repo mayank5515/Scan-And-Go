@@ -44,7 +44,7 @@ const processProducts = (products) => {
 //this will be called initially only
 exports.createActiveBill = async (req, res) => {
   try {
-    console.log("REQ USER: ", req.user.activeBill !== null, !req.user);
+    // console.log("REQ USER: ", req.user.activeBill !== null, !req.user);
 
     if (req.user && req.user.activeBill === null) {
       const newBill = await Bill.create({
