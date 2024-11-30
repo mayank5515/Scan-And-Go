@@ -11,7 +11,6 @@
 //   const [products, setProducts] = useState([]);
 //   const [totalBill, setTotalBill] = useState(0);
 //   //
-//   //   const URL = `http://192.168.179.131:3000`;
 //   const URL = "http://127.0.0.1:3000";
 //   useEffect(() => {
 //     const fetchAllProducts = async () => {
